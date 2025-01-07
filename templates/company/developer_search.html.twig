@@ -1,0 +1,154 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recherche de développeurs{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .search-header {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 1rem;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .search-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .search-card .form-label {
+            color: white;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .search-card .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+        }
+        .search-card .form-control:focus {
+            background: white;
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+        }
+        .search-card .btn-search {
+            background: white;
+            color: #4e73df;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .search-card .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .developer-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .developer-card:hover {
+            transform: translateY(-5px);
+        }
+        .skill-badge {
+            background: rgba(78, 115, 223, 0.1);
+            color: #4e73df;
+            border-radius: 20px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="search-header">
+        <div class="container">
+            <h1 class="h2 mb-4 ms-4">Recherche de développeurs</h1>
+            <div class="search-card">
+                {{ form_start(filterForm, {'attr': {'class': 'row g-4'}}) }}
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form_label(filterForm.name) }}
+                            {{ form_widget(filterForm.name, {
+                                'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'Ex: John Doe'
+                                }
+                            }) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form_label(filterForm.location) }}
+                            {{ form_widget(filterForm.location, {
+                                'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'Ex: Paris'
+                                }
+                            }) }}
+                        </div>
+                    </div>
+                    <div class="col-12 text-center mt-4">
+                        <button type="submit" class="btn btn-search">
+                            <i class="fas fa-search me-2"></i>Rechercher
+                        </button>
+                    </div>
+                {{ form_end(filterForm) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            {% if developers is empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        Aucun développeur ne correspond à vos critères de recherche.
+                    </div>
+                </div>
+            {% else %}
+                {% for developer in developers %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card developer-card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ developer.firstName }} {{ developer.lastName }}</h5>
+                                {% if developer.location %}
+                                    <p class="card-text">
+                                        <i class="fas fa-map-marker-alt me-2"></i>{{ developer.location }}
+                                    </p>
+                                {% endif %}
+                                
+                                {% if developer.programmingLanguages %}
+                                    <div class="mt-3">
+                                        {% for language in developer.programmingLanguages %}
+                                            <span class="skill-badge">{{ language }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+
+                                <div class="mt-3">
+                                    <a href="{{ path('app_company_view_developer', {'jobId': 201, 'developerId': developer.id}) }}" 
+                                       class="btn btn-primary">
+                                        <i class="fas fa-eye me-2"></i>Voir le profil
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

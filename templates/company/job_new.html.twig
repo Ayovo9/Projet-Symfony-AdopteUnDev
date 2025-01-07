@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Publier une offre d'emploi{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .programming-languages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .form-check-label {
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s;
+        }
+        .form-check-label:hover {
+            background-color: #f8f9fa;
+        }
+        .form-check-input:checked + .form-check-label {
+            background-color: #e9ecef;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+    
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h1 class="h3 mb-4">Publier une offre d'emploi</h1>
+
+                    {{ form_start(form) }}
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            {{ form_label(form.title) }}
+                            {{ form_widget(form.title) }}
+                            {{ form_errors(form.title) }}
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            {{ form_label(form.description) }}
+                            {{ form_widget(form.description) }}
+                            {{ form_errors(form.description) }}
+                            <div class="form-text">Décrivez le poste, les responsabilités et les qualifications requises.</div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.location) }}
+                            {{ form_widget(form.location) }}
+                            {{ form_errors(form.location) }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.contractType) }}
+                            {{ form_widget(form.contractType) }}
+                            {{ form_errors(form.contractType) }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.experienceLevel) }}
+                            {{ form_widget(form.experienceLevel) }}
+                            {{ form_errors(form.experienceLevel) }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.salary) }}
+                            {{ form_widget(form.salary) }}
+                            {{ form_errors(form.salary) }}
+                            <div class="form-text">Salaire annuel brut en euros (20 000€ - 200 000€)</div>
+                        </div>
+
+                        <div class="col-12 mb-4">
+                            <label class="form-label">{{ form_label(form.programmingLanguages) }}</label>
+                            <div class="programming-languages-grid">
+                                {% for language in form.programmingLanguages %}
+                                    <div class="form-check">
+                                        {{ form_widget(language) }}
+                                        <label class="form-check-label" for="{{ language.vars.id }}">
+                                            {% set icon = {
+                                                'PHP': 'fab fa-php',
+                                                'JavaScript': 'fab fa-js',
+                                                'Python': 'fab fa-python',
+                                                'Java': 'fab fa-java',
+                                                'Ruby': 'fas fa-gem',
+                                                'Swift': 'fab fa-swift',
+                                                'TypeScript': 'fab fa-js',
+                                                'C#': 'fab fa-microsoft',
+                                                'Go': 'fas fa-code',
+                                                'Kotlin': 'fab fa-android'
+                                            } %}
+                                            <i class="{{ icon[language.vars.label]|default('fas fa-code') }} me-2"></i>
+                                            {{ language.vars.label }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {{ form_errors(form.programmingLanguages) }}
+                            <div class="form-text">Sélectionnez les langages requis pour le poste.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i> Publier l'offre
+                        </button>
+                        <a href="{{ path('app_company_jobs') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Retour aux offres
+                        </a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
