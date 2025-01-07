@@ -1,0 +1,367 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord - {{ app.user.companyProfile.name }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .dashboard-header {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            border-radius: 1rem;
+            padding: 2.5rem 0;
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .dashboard-header h1 {
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        .dashboard-header .btn-light,
+        .dashboard-header .btn-light:active,
+        .dashboard-header .btn-light:focus {
+            background-color: white !important;
+            color: #4F46E5 !important;
+            border: none !important;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease-in-out;
+        }
+        .dashboard-header .btn-light:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15) !important;
+            background-color: white !important;
+            color: #000000 !important;
+        }
+        .job-card {
+            margin-bottom: 2rem;
+            border: none;
+            transition: transform 0.2s;
+        }
+        .job-card:hover {
+            transform: translateY(-5px);
+        }
+        .match-score {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+        }
+        .score-high {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        .score-medium {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+        .score-low {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+        .skill-badge {
+            font-size: 0.85rem;
+            padding: 0.35rem 0.75rem;
+            margin: 0.25rem;
+            border-radius: 20px;
+            background-color: #e9ecef;
+            color: #495057;
+            border: 1px solid #dee2e6;
+        }
+        .dev-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .matches-preview {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .matches-count {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .job-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .stat-item {
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            flex: 1;
+        }
+        .stat-item.views {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+        }
+        .stat-item.matches {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+        }
+        .developer-card {
+            padding: 0.75rem;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            transition: transform 0.2s;
+        }
+        .developer-card:hover {
+            transform: translateY(-2px);
+            background-color: #e9ecef;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="ms-4">
+                    <h1 class="display-4 mb-2">Tableau de bord</h1>
+                    <p class="lead mb-0">
+                        Bienvenue, {{ app.user.companyProfile.name }}
+                    </p>
+                </div>
+                <a href="{{ path('app_company_job_new') }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus-circle me-2"></i>Publier une offre
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <!-- Colonne de gauche pour les profils -->
+            <div class="col-lg-3">
+                <!-- Profils les plus consultés -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Profils les plus consultés</h5>
+                        {% for developer in mostViewedDevelopers %}
+                            <div class="developer-card mb-3">
+                                <div class="d-flex align-items-center">
+                                    {% if developer.avatar %}
+                                        <img src="{{ asset('uploads/avatars/' ~ developer.avatar) }}" alt="{{ developer.firstName }}" class="dev-avatar me-2">
+                                    {% else %}
+                                        <i class="fas fa-user-circle dev-avatar me-2"></i>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0">{{ developer.firstName }} {{ developer.lastName }}</h6>
+                                        <small class="text-muted">{{ developer.title }}</small>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    {% if jobsWithMatches|length > 0 %}
+                                        <a href="{{ path('app_company_view_developer', {'jobId': jobsWithMatches[0].job.id, 'developerId': developer.id}) }}" class="btn btn-outline-primary btn-sm w-100">
+                                            Voir le profil
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-outline-secondary btn-sm w-100" disabled>
+                                            Créez une offre pour voir le profil
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Derniers profils créés -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Derniers profils créés</h5>
+                        {% for developer in latestDevelopers %}
+                            <div class="developer-card mb-3">
+                                <div class="d-flex align-items-center">
+                                    {% if developer.avatar %}
+                                        <img src="{{ asset('uploads/avatars/' ~ developer.avatar) }}" alt="{{ developer.firstName }}" class="dev-avatar me-2">
+                                    {% else %}
+                                        <i class="fas fa-user-circle dev-avatar me-2"></i>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0">{{ developer.firstName }} {{ developer.lastName }}</h6>
+                                        <small class="text-muted">{{ developer.title }}</small>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    {% if jobsWithMatches|length > 0 %}
+                                        <a href="{{ path('app_company_view_developer', {'jobId': jobsWithMatches[0].job.id, 'developerId': developer.id}) }}" class="btn btn-outline-primary btn-sm w-100">
+                                            Voir le profil
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-outline-secondary btn-sm w-100" disabled>
+                                            Créez une offre pour voir le profil
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne principale -->
+            <div class="col-lg-9">
+                <!-- Bloc de filtrage -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-gradient" style="background-color: #f8f9fa;">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-filter me-2 text-primary"></i>
+                            <h5 class="card-title mb-0">Filtrer vos offres</h5>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {{ form_start(filterForm, {'attr': {'class': 'row g-3'}}) }}
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        {{ form_label(filterForm.location, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                            {{ form_widget(filterForm.location, {
+                                                'attr': {
+                                                    'class': 'form-control',
+                                                    'placeholder': 'Ville, région...'
+                                                }
+                                            }) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        {{ form_label(filterForm.contractType, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-file-contract"></i></span>
+                                            {{ form_widget(filterForm.contractType, {'attr': {'class': 'form-select'}}) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        {{ form_label(filterForm.minSalary, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-euro-sign"></i></span>
+                                            {{ form_widget(filterForm.minSalary, {
+                                                'attr': {
+                                                    'class': 'form-control',
+                                                    'placeholder': 'Ex: 35000'
+                                                }
+                                            }) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h6 class="fw-bold mb-3">
+                                        <i class="fas fa-code me-2 text-primary"></i>
+                                        {{ form_label(filterForm.programmingLanguages) }}
+                                    </h6>
+                                    <div class="d-flex flex-wrap gap-3 bg-light p-3 rounded">
+                                        {% for language in filterForm.programmingLanguages %}
+                                            <div class="form-check">
+                                                {{ form_widget(language, {'attr': {'class': 'form-check-input'}}) }}
+                                                {{ form_label(language, null, {
+                                                    'label_attr': {
+                                                        'class': 'form-check-label'
+                                                    }
+                                                }) }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        {{ form_label(filterForm.experienceLevel, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                                            {{ form_widget(filterForm.experienceLevel, {'attr': {'class': 'form-select'}}) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <button type="submit" class="btn btn-primary w-100 btn-lg">
+                                        <i class="fas fa-search me-2"></i>Rechercher
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="{{ path('app_company_dashboard') }}" class="btn btn-outline-secondary w-100 btn-lg">
+                                        <i class="fas fa-undo me-2"></i>Réinitialiser
+                                    </a>
+                                </div>
+                            </div>
+                        {{ form_end(filterForm) }}
+                    </div>
+                </div>
+
+                <!-- Liste des offres -->
+                {% if jobsWithMatches|length > 0 %}
+                    <div class="row">
+                        {% for jobWithMatches in jobsWithMatches %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card job-card shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-2">{{ jobWithMatches.job.title }}</h5>
+                                        
+                                        <div class="job-stats">
+                                            <div class="stat-item matches">
+                                                <div class="h4 mb-0">{{ jobWithMatches.matches|length }}</div>
+                                                <small>Matchs</small>
+                                            </div>
+                                            <div class="stat-item views">
+                                                <div class="h4 mb-0">{{ jobWithMatches.job.location }}</div>
+                                                <small>Localisation</small>
+                                            </div>
+                                        </div>
+
+                                        {% if jobWithMatches.matches|length > 0 %}
+                                            <div class="matches-preview">
+                                                <div class="matches-count">
+                                                    {{ jobWithMatches.matches|length }} développeur{% if jobWithMatches.matches|length > 1 %}s{% endif %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="d-grid gap-2 mt-3">
+                                            <a href="{{ path('app_job_matches', {'id': jobWithMatches.job.id}) }}" 
+                                               class="btn btn-primary">
+                                                <i class="fas fa-users me-2"></i>Voir les matchs
+                                            </a>
+                                            <a href="{{ path('app_company_job_edit', {'id': jobWithMatches.job.id}) }}" 
+                                               class="btn btn-outline-secondary">
+                                                <i class="fas fa-edit me-2"></i>Modifier
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Vous n'avez pas encore créé d'offre d'emploi. 
+                        <a href="{{ path('app_company_job_new') }}" class="alert-link">Créez votre première offre</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

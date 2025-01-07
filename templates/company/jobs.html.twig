@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes offres d'emploi{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+    
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Mes offres d'emploi</h1>
+        <a href="{{ path('app_company_job_new') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Publier une nouvelle offre
+        </a>
+    </div>
+
+    {% if jobs|length > 0 %}
+        <div class="row">
+            {% for job in jobs %}
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title mb-0">{{ job.title }}</h5>
+                                <span class="badge bg-primary">{{ job.contractType }}</span>
+                            </div>
+                            
+                            <p class="card-text text-muted small mb-2">
+                                <i class="fas fa-map-marker-alt me-1"></i> {{ job.location }}
+                            </p>
+                            
+                            <p class="card-text">{{ job.description|slice(0, 200) }}...</p>
+                            
+                            <div class="mb-3">
+                                <h6 class="small text-muted mb-2">Compétences requises :</h6>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for language in job.programmingLanguages %}
+                                        <span class="badge bg-secondary">{{ language }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="small text-muted">
+                                    <i class="fas fa-clock me-1"></i> Publié le {{ job.createdAt|date('d/m/Y') }}
+                                </div>
+                                <div class="btn-group">
+                                    <a href="{{ path('app_company_job_edit', {'id': job.id}) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit me-1"></i> Modifier
+                                    </a>
+                                    <form method="post" action="{{ path('app_company_job_delete', {'id': job.id}) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ job.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash me-1"></i> Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <p class="text-muted mb-3">Vous n'avez pas encore publié d'offres d'emploi.</p>
+            <a href="{{ path('app_company_job_new') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Publier votre première offre
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
