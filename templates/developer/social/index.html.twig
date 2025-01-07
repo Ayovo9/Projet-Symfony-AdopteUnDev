@@ -1,0 +1,252 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Espace Social{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .search-section {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 1rem;
+            color: white;
+        }
+        .developer-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .developer-card:hover {
+            transform: translateY(-5px);
+        }
+        .rating-stars {
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .rating-stars .star {
+            color: #e0e0e0;
+            transition: color 0.2s;
+        }
+        .rating-stars .star.active {
+            color: #ffd700;
+        }
+        .rating-stars .star:hover {
+            transform: scale(1.2);
+        }
+        .developer-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .current-rating {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
+{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.rating-container').forEach(container => {
+                const stars = container.querySelectorAll('.star');
+                const developerId = container.dataset.developerId;
+                let selectedRating = 0;
+
+                stars.forEach((star, index) => {
+                    star.addEventListener('mouseover', () => {
+                        stars.forEach((s, i) => {
+                            s.classList.toggle('active', i <= index);
+                        });
+                    });
+
+                    star.addEventListener('mouseout', () => {
+                        if (selectedRating === 0) {
+                            stars.forEach(s => s.classList.remove('active'));
+                        } else {
+                            stars.forEach((s, i) => {
+                                s.classList.toggle('active', i < selectedRating);
+                            });
+                        }
+                    });
+
+                    star.addEventListener('click', () => {
+                        const rating = index + 1;
+                        const formData = new FormData();
+                        formData.append('rating', rating);
+                        
+                        console.log('Envoi de la notation:', {
+                            developerId,
+                            rating
+                        });
+                        
+                        fetch(`/developer/social/rate/${developerId}`, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => {
+                            console.log('Réponse reçue:', response.status);
+                            if (!response.ok) {
+                                return response.json().then(data => {
+                                    console.error('Erreur serveur:', data);
+                                    throw new Error(data.error || 'Une erreur est survenue');
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Données reçues:', data);
+                            if (data.error) {
+                                throw new Error(data.error);
+                            }
+                            selectedRating = rating;
+                            const ratingText = `Note moyenne : ${data.averageRating}`;
+                            console.log('Mise à jour du texte:', ratingText);
+                            container.querySelector('.current-rating').textContent = ratingText;
+                            stars.forEach((s, i) => {
+                                s.classList.toggle('active', i < rating);
+                            });
+                            container.classList.add('rated');
+                        })
+                        .catch(error => {
+                            console.error('Erreur:', error);
+                            alert(error.message || 'Une erreur est survenue lors de la notation.');
+                        });
+                    });
+                });
+            });
+
+            document.querySelectorAll('.toggle-favorite').forEach(button => {
+                button.addEventListener('click', function() {
+                    const type = this.dataset.type;
+                    const id = this.dataset.id;
+                    const icon = this.querySelector('i');
+                    
+                    fetch(`/favorite/toggle/${type}/${id}`, {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (data.status === 'added') {
+                                icon.classList.remove('far');
+                                icon.classList.add('fas');
+                                this.textContent = ' Retirer des favoris';
+                                this.prepend(icon);
+                            } else {
+                                icon.classList.remove('fas');
+                                icon.classList.add('far');
+                                this.textContent = ' Ajouter aux favoris';
+                                this.prepend(icon);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Une erreur est survenue lors de la modification des favoris.');
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="search-section">
+        <div class="container">
+            <h1 class="h2 mb-4 ms-4">Rechercher un développeur</h1>
+            {{ form_start(form, {'attr': {'class': 'row g-3 align-items-center'}}) }}
+                <div class="col-md-10">
+                    {{ form_widget(form.search) }}
+                </div>
+                <div class="col-md-2">
+                    {{ form_widget(form.submit) }}
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    <div class="container">
+        {% if developers is not empty %}
+            <div class="row">
+                {% for developer in developers %}
+                    {% if developer != app.user.developerProfile %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="developer-card card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img src="{{ developer.avatar ? asset('uploads/avatars/' ~ developer.avatar) : asset('images/default-avatar.png') }}"
+                                             alt="{{ developer.firstName }}"
+                                             class="developer-avatar me-3">
+                                        <div>
+                                            <h5 class="card-title mb-1">
+                                                {{ developer.firstName }} {{ developer.lastName }}
+                                            </h5>
+                                            <p class="text-muted mb-0">
+                                                <i class="fas fa-map-marker-alt me-1"></i>
+                                                {{ developer.location }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="rating-container" data-developer-id="{{ developer.id }}">
+                                        <div class="rating-stars mb-2">
+                                            {% for i in 1..5 %}
+                                                <i class="fas fa-star star"></i>
+                                            {% endfor %}
+                                        </div>
+                                        <small class="current-rating">
+                                            Note moyenne : {{ developer.averageRating|number_format(1) }}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="rating-container" data-developer-id="{{ developer.id }}">
+                                            <div class="stars">
+                                                {% for i in 1..5 %}
+                                                    <span class="star" data-value="{{ i }}">★</span>
+                                                {% endfor %}
+                                            </div>
+                                            <small class="current-rating">
+                                                {% if developer.averageRating > 0 %}
+                                                    Note moyenne : {{ developer.averageRating|number_format(1) }}
+                                                {% else %}
+                                                    Pas encore de note
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                        <div class="favorite-btn-container">
+                                            <button class="btn btn-sm btn-outline-primary toggle-favorite"
+                                                    data-type="developer"
+                                                    data-id="{{ developer.id }}">
+                                                <i class="{{ is_favorite(developer) ? 'fas' : 'far' }} fa-heart me-1"></i>
+                                                {% if is_favorite(developer) %}
+                                                    Retirer des favoris
+                                                {% else %}
+                                                    Ajouter aux favoris
+                                                {% endif %}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% elseif form.vars.submitted %}
+            <div class="alert alert-info">
+                Aucun développeur trouvé pour cette recherche.
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
