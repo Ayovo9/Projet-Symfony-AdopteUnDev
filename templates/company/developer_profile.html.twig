@@ -1,0 +1,322 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ developer.firstName }} {{ developer.lastName }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .profile-header {
+            background: linear-gradient(135deg, #6f42c1 0%, #4e73df 100%);
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        .profile-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 1.5rem;
+        }
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 1rem;
+        }
+        .skill-badge {
+            font-size: 0.85rem;
+            padding: 0.35rem 0.75rem;
+            margin: 0.25rem;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .skill-match {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            border: 1px solid #90caf9;
+        }
+        .skill-missing {
+            background-color: #f5f5f5;
+            color: #757575;
+            border: 1px solid #e0e0e0;
+        }
+        .social-link {
+            color: #6c757d;
+            font-size: 1.5rem;
+            transition: color 0.2s;
+            margin: 0 0.5rem;
+        }
+        .social-link:hover {
+            color: #4e73df;
+        }
+        .stats-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #4e73df;
+            margin-bottom: 0.5rem;
+        }
+        .stats-label {
+            color: #858796;
+            font-size: 0.875rem;
+        }
+        .stats-icon {
+            font-size: 1.5rem;
+            color: #4e73df;
+            margin-bottom: 1rem;
+        }
+        .btn-favorite {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-favorite:hover {
+            color: #fff;
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-favorite .fas {
+            color: #dc3545;
+        }
+        .btn-favorite:hover .fas,
+        .btn-favorite:hover .far {
+            color: #fff;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="profile-header">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ path('app_company_dashboard') }}" class="text-white">Tableau de bord</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ path('app_job_matches', {'id': job.id}) }}" class="text-white">Retour aux matchs</a>
+                    </li>
+                    <li class="breadcrumb-item active text-white" aria-current="page">
+                        {{ developer.firstName }} {{ developer.lastName }}
+                    </li>
+                </ol>
+            </nav>
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center">
+                    <img src="{{ developer.avatar ? asset('uploads/avatars/' ~ developer.avatar) : asset('images/default-avatar.svg') }}" 
+                         alt="{{ developer.firstName }}" 
+                         class="profile-avatar">
+                </div>
+                <div class="col-md-9">
+                    <h1 class="display-4 mb-2">{{ developer.firstName }} {{ developer.lastName }}</h1>
+                    <p class="lead mb-3">
+                        {% if developer.title %}
+                            {{ developer.title }}
+                        {% else %}
+                            {% if developer.experienceLevel == 1 %}
+                                Développeur Junior
+                            {% elseif developer.experienceLevel == 2 %}
+                                Développeur Intermédiaire
+                            {% else %}
+                                Développeur Senior
+                            {% endif %}
+                        {% endif %}
+                    </p>
+                    <div class="d-flex align-items-center gap-3">
+                        <p class="mb-0">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            {{ developer.location }}
+                        </p>
+                        <p class="mb-0">
+                            <i class="fas fa-briefcase me-2"></i>
+                            {{ developer.preferredContractType }}
+                        </p>
+                        <p class="mb-0">
+                            <i class="fas fa-code me-2"></i>
+                            {{ developer.experienceLevel }} 
+                            {% if developer.experienceLevel == 1 %}
+                                an
+                            {% else %}
+                                ans
+                            {% endif %} 
+                            d'expérience
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="profile-card card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Informations professionnelles</h5>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-2">Expérience</h6>
+                                <p class="mb-0">
+                                    {% if developer.experienceLevel == 1 %}
+                                        Junior (1-2 ans)
+                                    {% elseif developer.experienceLevel == 2 %}
+                                        Intermédiaire (2-4 ans)
+                                    {% else %}
+                                        Senior (5+ ans)
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-2">Type de contrat souhaité</h6>
+                                <p class="mb-0">{{ developer.preferredContractType }}</p>
+                            </div>
+                        </div>
+
+                        {% if developer.minimumSalary %}
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h6 class="text-muted mb-2">Salaire minimum souhaité</h6>
+                                <p class="mb-0">{{ developer.minimumSalary|number_format(0, ',', ' ') }} € brut/an</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if developer.bio %}
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-2">Bio</h6>
+                            <p class="mb-0">{{ developer.bio }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="profile-card card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Compétences</h5>
+                        <div>
+                            {% for language in job.programmingLanguages %}
+                                <span class="skill-badge {{ language in developer.programmingLanguages ? 'skill-match' : 'skill-missing' }}">
+                                    <i class="fas {{ language in developer.programmingLanguages ? 'fa-check-circle' : 'fa-times-circle' }}"></i>
+                                    {{ language }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="profile-card card mb-4">
+                    <div class="card-body stats-card">
+                        <div class="stats-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="stats-number">{{ totalViews }}</div>
+                        <div class="stats-label">Nombre total de vues</div>
+                    </div>
+                </div>
+
+                <div class="profile-card card mb-4">
+                    <div class="card-body stats-card">
+                        <div class="stats-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="stats-number">{{ uniqueCompanyViews }}</div>
+                        <div class="stats-label">Entreprises intéressées</div>
+                    </div>
+                </div>
+
+                <div class="profile-card card mb-4">
+                    <div class="card-body stats-card">
+                        <div class="stats-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stats-number">
+                            {% if averageRating > 0 %}
+                                {{ averageRating|number_format(1) }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                        <div class="stats-label">Note moyenne</div>
+                    </div>
+                </div>
+
+                <div class="profile-card card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Contact</h5>
+                        <div class="d-flex justify-content-center mb-3">
+                            {% if developer.github %}
+                                <a href="{{ developer.github }}" target="_blank" class="social-link">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                            {% endif %}
+                            {% if developer.linkedin %}
+                                <a href="{{ developer.linkedin }}" target="_blank" class="social-link">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                        <div class="d-grid">
+                            <button class="btn btn-favorite toggle-favorite" data-type="developer" data-id="{{ developer.id }}">
+                                <i class="{{ is_favorite(developer) ? 'fas' : 'far' }} fa-heart me-1"></i>
+                                {% if is_favorite(developer) %}
+                                    Retirer des favoris
+                                {% else %}
+                                    Ajouter aux favoris
+                                {% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const favoriteButton = document.querySelector('.toggle-favorite');
+            if (favoriteButton) {
+                favoriteButton.addEventListener('click', function() {
+                    const type = this.dataset.type;
+                    const id = this.dataset.id;
+                    const icon = this.querySelector('i');
+                    const text = this.querySelector('span');
+
+                    fetch(`/favorite/toggle/${type}/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (data.isFavorite) {
+                                icon.classList.remove('far');
+                                icon.classList.add('fas');
+                                this.innerHTML = `<i class="fas fa-heart me-1"></i>Retirer des favoris`;
+                            } else {
+                                icon.classList.remove('fas');
+                                icon.classList.add('far');
+                                this.innerHTML = `<i class="far fa-heart me-1"></i>Ajouter aux favoris`;
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            }
+        });
+    </script>
+{% endblock %}

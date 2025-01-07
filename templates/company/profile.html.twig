@@ -1,0 +1,147 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ user.companyProfile.name|default('Profil entreprise') }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <div class="row">
+        <!-- Profil de l'entreprise -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    {% if user.companyProfile.logo %}
+                        <img src="{{ asset('uploads/logos/' ~ user.companyProfile.logo) }}" 
+                             class="img-fluid rounded-circle mb-3" 
+                             style="max-width: 150px;" 
+                             alt="Logo {{ user.companyProfile.name }}">
+                    {% endif %}
+                    
+                    <h2 class="h4 mb-3">{{ user.companyProfile.name|default(user.email) }}</h2>
+                    
+                    {% if user.companyProfile.industry %}
+                        <span class="badge bg-primary mb-3">{{ user.companyProfile.industry }}</span>
+                    {% endif %}
+
+                    {% if not user.companyProfile or not user.companyProfile.name %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Complétez votre profil pour une meilleure visibilité
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{{ path('app_company_profile_edit') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-1"></i> Modifier le profil
+                        </a>
+                        <a href="{{ path('app_company_job_new') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i> Publier une offre
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {% if user.companyProfile and user.companyProfile.description %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h3 class="h5 mb-3">À propos de nous</h3>
+                        <p class="mb-0">{{ user.companyProfile.description }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Offres d'emploi -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="h5 mb-0">Nos offres d'emploi</h3>
+                            <p class="text-muted small mb-0">
+                                {{ user.companyProfile ? user.companyProfile.jobPosts|length : 0 }} offre(s) publiée(s)
+                            </p>
+                        </div>
+                        <div class="btn-group">
+                            <a href="{{ path('app_company_jobs') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-list me-1"></i> Toutes les offres
+                            </a>
+                            <a href="{{ path('app_company_job_new') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i> Nouvelle offre
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    {% if user.companyProfile and user.companyProfile.jobPosts|length > 0 %}
+                        <div class="list-group list-group-flush">
+                            {% for job in user.companyProfile.jobPosts|slice(0, 5) %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-1">{{ job.title }}</h5>
+                                            <p class="mb-1 small text-muted">
+                                                <i class="fas fa-briefcase me-1"></i> {{ job.contractType }}
+                                                <span class="mx-2">•</span>
+                                                <i class="fas fa-clock me-1"></i> Publié le {{ job.createdAt|date('d/m/Y') }}
+                                            </p>
+                                        </div>
+                                        <div class="btn-group">
+                                            <a href="{{ path('app_company_job_edit', {'id': job.id}) }}" 
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="Modifier l'offre">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('app_company_job_delete', {'id': job.id}) }}" 
+                                                  style="display: inline-block;"
+                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ job.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer l'offre">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        {% if user.companyProfile.jobPosts|length > 5 %}
+                            <div class="text-center mt-4">
+                                <a href="{{ path('app_company_jobs') }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-list me-1"></i>
+                                    Voir toutes nos offres ({{ user.companyProfile.jobPosts|length }})
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="text-muted mb-4">
+                                <i class="fas fa-clipboard fa-3x mb-3"></i>
+                                <p>Vous n'avez pas encore publié d'offres d'emploi</p>
+                            </div>
+                            <a href="{{ path('app_company_job_new') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i> Publier votre première offre
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

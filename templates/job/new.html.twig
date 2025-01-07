@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Publier une nouvelle offre{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .language-checkbox {
+            margin-right: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .language-checkbox input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 class="h3 mb-4">Publier une nouvelle offre</h1>
+
+                <div class="form-card">
+                    {{ form_start(form) }}
+                        <h4 class="section-title">Informations sur le poste</h4>
+                        <div class="mb-3">
+                            {{ form_label(form.title) }}
+                            {{ form_widget(form.title, {'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Ex: Développeur Full Stack JavaScript'
+                            }}) }}
+                            {{ form_errors(form.title) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(form.description) }}
+                            {{ form_widget(form.description, {'attr': {
+                                'class': 'form-control',
+                                'rows': 5,
+                                'placeholder': 'Décrivez le poste, les responsabilités et les compétences requises...'
+                            }}) }}
+                            {{ form_errors(form.description) }}
+                        </div>
+
+                        <h4 class="section-title">Conditions</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.contractType) }}
+                                {{ form_widget(form.contractType, {'attr': {'class': 'form-select'}}) }}
+                                {{ form_errors(form.contractType) }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.experienceLevel) }}
+                                {{ form_widget(form.experienceLevel, {'attr': {'class': 'form-select'}}) }}
+                                {{ form_errors(form.experienceLevel) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.location) }}
+                                {{ form_widget(form.location, {'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'Ex: Paris, France'
+                                }}) }}
+                                {{ form_errors(form.location) }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.salary) }}
+                                {{ form_widget(form.salary, {'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'Ex: 45000'
+                                }}) }}
+                                {{ form_errors(form.salary) }}
+                                <small class="form-text text-muted">Salaire annuel brut en euros</small>
+                            </div>
+                        </div>
+
+                        <h4 class="section-title">Compétences techniques</h4>
+                        <div class="mb-4">
+                            {{ form_label(form.programmingLanguages) }}
+                            <div class="d-flex flex-wrap mt-2">
+                                {% for language in form.programmingLanguages %}
+                                    <div class="language-checkbox">
+                                        <label class="form-check-label">
+                                            {{ form_widget(language, {'attr': {'class': 'form-check-input'}}) }}
+                                            {{ language.vars.label }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {{ form_errors(form.programmingLanguages) }}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ path('app_company_dashboard') }}" class="btn btn-outline-secondary me-2">
+                                <i class="fas fa-arrow-left me-2"></i>Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus-circle me-2"></i>Publier l'offre
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
