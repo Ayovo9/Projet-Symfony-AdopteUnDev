@@ -1,0 +1,195 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ isNewProfile ? 'Créer mon profil' : 'Modifier mon profil' }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .profile-form {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .form-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            background: white;
+        }
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 3px solid #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .avatar-upload {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .language-checkbox {
+            margin-right: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .language-checkbox input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+        .form-check-label {
+            cursor: pointer;
+        }
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <div class="profile-form">
+            <h1 class="h3 mb-4">{{ isNewProfile ? 'Créer mon profil' : 'Modifier mon profil' }}</h1>
+
+            <div class="form-card card">
+                <div class="card-body">
+                    {{ form_start(form) }}
+                        <div class="avatar-upload">
+                            {% if profile.avatar %}
+                                <img src="{{ asset('uploads/avatars/' ~ profile.avatar) }}" 
+                                     alt="Avatar actuel" 
+                                     class="avatar-preview">
+                            {% else %}
+                                <img src="{{ asset('images/default-avatar.png') }}" 
+                                     alt="Avatar par défaut"
+                                     class="avatar-preview">
+                            {% endif %}
+                            
+                            <div class="mt-3">
+                                {{ form_widget(form.avatarFile, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'accept': 'image/jpeg,image/png'
+                                    }
+                                }) }}
+                                {{ form_errors(form.avatarFile) }}
+                                <small class="form-text text-muted">
+                                    Formats acceptés : JPG, PNG. Taille maximale : 1Mo
+                                </small>
+                            </div>
+                        </div>
+
+                        <h4 class="section-title">Informations personnelles</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.firstName) }}
+                                {{ form_widget(form.firstName, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.firstName) }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.lastName) }}
+                                {{ form_widget(form.lastName, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.lastName) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(form.bio) }}
+                            {{ form_widget(form.bio, {'attr': {
+                                'class': 'form-control',
+                                'rows': 5,
+                                'placeholder': 'Décrivez votre parcours, vos compétences et vos objectifs professionnels...'
+                            }}) }}
+                            {{ form_errors(form.bio) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(form.location) }}
+                            {{ form_widget(form.location, {'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Ex: Paris, France'
+                            }}) }}
+                            {{ form_errors(form.location) }}
+                        </div>
+
+                        <h4 class="section-title">Expérience et préférences</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.experienceLevel) }}
+                                {{ form_widget(form.experienceLevel, {'attr': {'class': 'form-select'}}) }}
+                                {{ form_errors(form.experienceLevel) }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.preferredContractType) }}
+                                {{ form_widget(form.preferredContractType, {'attr': {'class': 'form-select'}}) }}
+                                {{ form_errors(form.preferredContractType) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(form.minimumSalary) }}
+                            {{ form_widget(form.minimumSalary, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.minimumSalary) }}
+                            {% if form.minimumSalary.vars.help is defined %}
+                                <small class="form-text text-muted">{{ form.minimumSalary.vars.help }}</small>
+                            {% endif %}
+                        </div>
+
+                        <h4 class="section-title">Réseaux sociaux</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.github) }}
+                                {{ form_widget(form.github, {'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'https://github.com/username'
+                                }}) }}
+                                {{ form_errors(form.github) }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.linkedin) }}
+                                {{ form_widget(form.linkedin, {'attr': {
+                                    'class': 'form-control',
+                                    'placeholder': 'https://linkedin.com/in/username'
+                                }}) }}
+                                {{ form_errors(form.linkedin) }}
+                            </div>
+                        </div>
+
+                        <h4 class="section-title">Compétences techniques</h4>
+                        <div class="mb-4">
+                            {{ form_label(form.programmingLanguages) }}
+                            <div class="d-flex flex-wrap mt-2">
+                                {% for language in form.programmingLanguages %}
+                                    <div class="language-checkbox">
+                                        <label class="form-check-label">
+                                            {{ form_widget(language, {'attr': {'class': 'form-check-input'}}) }}
+                                            {{ language.vars.label }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {{ form_errors(form.programmingLanguages) }}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ path('app_developer_dashboard') }}" class="btn btn-outline-secondary me-2">
+                                <i class="fas fa-arrow-left me-2"></i>Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if isNewProfile %}
+                                    <i class="fas fa-plus-circle me-2"></i>Créer mon profil
+                                {% else %}
+                                    <i class="fas fa-save me-2"></i>Enregistrer les modifications
+                                {% endif %}
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

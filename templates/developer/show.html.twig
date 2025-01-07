@@ -1,0 +1,188 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ developer.firstName }} {{ developer.lastName }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .profile-header {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        .profile-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 1.5rem;
+        }
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 1rem;
+        }
+        .skill-badge {
+            font-size: 0.85rem;
+            padding: 0.35rem 0.75rem;
+            margin: 0.25rem;
+            border-radius: 20px;
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            border: 1px solid #90caf9;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .social-link {
+            color: #6c757d;
+            font-size: 1.5rem;
+            transition: color 0.2s;
+            margin: 0 0.5rem;
+        }
+        .social-link:hover {
+            color: #4e73df;
+        }
+        .experience-badge, .location-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            background-color: #f8f9fa;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+        .experience-badge i, .location-badge i {
+            color: #6f42c1;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="profile-header">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    {% if isCompanyViewing %}
+                        <li class="breadcrumb-item">
+                            <a href="{{ path('app_company_dashboard') }}" class="text-white">Tableau de bord</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="javascript:history.back()" class="text-white">Retour aux matchs</a>
+                        </li>
+                    {% else %}
+                        <li class="breadcrumb-item">
+                            <a href="{{ path('app_developer_profile') }}" class="text-white">Mon profil</a>
+                        </li>
+                    {% endif %}
+                    <li class="breadcrumb-item active text-white" aria-current="page">
+                        {{ developer.firstName }} {{ developer.lastName }}
+                    </li>
+                </ol>
+            </nav>
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center">
+                    <img src="{{ asset('images/default-avatar.svg') }}" 
+                         alt="{{ developer.firstName }}" 
+                         class="profile-avatar">
+                </div>
+                <div class="col-md-9">
+                    <h1 class="display-4 mb-2">{{ developer.firstName }} {{ developer.lastName }}</h1>
+                    <p class="lead mb-3">
+                        {% if developer.title %}
+                            {{ developer.title }}
+                        {% else %}
+                            {% if developer.experienceLevel == 1 %}
+                                Développeur Junior
+                            {% elseif developer.experienceLevel == 2 %}
+                                Développeur Intermédiaire
+                            {% else %}
+                                Développeur Senior
+                            {% endif %}
+                        {% endif %}
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <span class="experience-badge">
+                            <i class="fas fa-code"></i>
+                            {% if developer.experienceLevel == 1 %}
+                                1 an d'expérience
+                            {% elseif developer.experienceLevel == 2 %}
+                                2-4 ans d'expérience
+                            {% else %}
+                                5+ ans d'expérience
+                            {% endif %}
+                        </span>
+                        <span class="location-badge">
+                            <i class="fas fa-map-marker-alt"></i>
+                            {{ developer.location }}
+                        </span>
+                        <span class="experience-badge">
+                            <i class="fas fa-briefcase"></i>
+                            {{ developer.preferredContractType }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="profile-card card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">À propos</h5>
+                        <p class="card-text">{{ developer.bio|nl2br }}</p>
+                    </div>
+                </div>
+
+                <div class="profile-card card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Compétences</h5>
+                        <div>
+                            {% for language in developer.programmingLanguages %}
+                                <span class="skill-badge">
+                                    <i class="fas fa-code"></i>
+                                    {{ language }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="profile-card card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Contact</h5>
+                        <div class="d-flex justify-content-center mb-3">
+                            {% if developer.github %}
+                                <a href="{{ developer.github }}" target="_blank" class="social-link">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                            {% endif %}
+                            {% if developer.linkedin %}
+                                <a href="{{ developer.linkedin }}" target="_blank" class="social-link">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                            {% endif %}
+                            <a href="mailto:{{ developer.user.email }}" class="social-link">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                        {% if isCompanyViewing %}
+                            <div class="d-grid">
+                                <a href="mailto:{{ developer.user.email }}" class="btn btn-primary">
+                                    <i class="fas fa-envelope me-2"></i>Contacter {{ developer.firstName }}
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

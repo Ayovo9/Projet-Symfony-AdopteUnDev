@@ -1,0 +1,378 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .profile-header {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            padding: 2.5rem 0;
+            border-radius: 1rem;
+
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .profile-header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+        }
+        .profile-header-info {
+            text-align: center;
+        }
+        .profile-header-info h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .profile-header-info .lead {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1rem;
+        }
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .social-links a {
+            color: white;
+            font-size: 1.2rem;
+            opacity: 0.9;
+            transition: all 0.2s;
+        }
+        .social-links a:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+        .profile-header-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 140px;
+        }
+        .stat-item i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0.5rem 0;
+            display: block;
+            color: white;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 0.25rem;
+        }
+        .rating-stars {
+            margin-top: 0.5rem;
+        }
+        .rating-star {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 0 0.1rem;
+        }
+        .rating-star:hover {
+            transform: scale(1.2);
+        }
+        .rating-star.fas {
+            color: #FFD700;
+        }
+        .static-stars {
+            margin-top: 0.5rem;
+        }
+        .static-star {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0 0.1rem;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            color: #2D3748;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section-title i {
+            color: #4F46E5;
+        }
+        .skill-badge {
+            font-size: 0.85rem;
+            padding: 0.35rem 0.75rem;
+            margin: 0.25rem;
+            border-radius: 20px;
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            border: 1px solid #90caf9;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .contact-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+        .contact-btn i {
+            font-size: 1.1rem;
+        }
+        .contact-btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-favorite {
+            color: #dc3545;
+            border-color: #dc3545;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+        .btn-favorite:hover {
+            color: #fff;
+            background-color: #dc3545;
+            border-color: #dc3545;
+            transform: translateY(-2px);
+        }
+        .btn-favorite .fas,
+        .btn-favorite .far {
+            color: #dc3545;
+        }
+        .btn-favorite:hover .fas,
+        .btn-favorite:hover .far {
+            color: #fff;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="profile-header">
+            <div class="container">
+                <div class="profile-header-content">
+                    <img src="{{ developer.avatar ? asset('uploads/avatars/' ~ developer.avatar) : asset('images/default-avatar.png') }}" 
+                         alt="Photo de profil" 
+                         class="profile-avatar">
+                    <div class="profile-header-info">
+                        <h1>{{ developer.firstName }} {{ developer.lastName }}</h1>
+                        <p class="lead">
+                            <i class="fas fa-map-marker-alt me-2"></i>{{ developer.location }}
+                        </p>
+                        <div class="social-links">
+                            {% if developer.github %}
+                                <a href="{{ developer.github }}" target="_blank" title="GitHub">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                            {% endif %}
+                            {% if developer.linkedin %}
+                                <a href="{{ developer.linkedin }}" target="_blank" title="LinkedIn">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                            {% endif %}
+                            <a href="mailto:{{ developer.user.email }}" title="Email">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-header-stats">
+                    <div class="stat-item views">
+                        <i class="fas fa-eye"></i>
+                        <div class="stat-value">{{ developer.viewCount }}</div>
+                        <div class="stat-label">Vues</div>
+                    </div>
+                    <div class="stat-item rating">
+                        <i class="fas fa-star"></i>
+                        <div class="stat-value" id="averageRating">
+                            {% if averageRating > 0 %}
+                                {{ averageRating|number_format(1) }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                        <div class="stat-label">Note moyenne</div>
+                        {% if app.user and app.user.developerProfile and not isOwnProfile %}
+                            <div class="rating-stars">
+                                {% for i in 1..5 %}
+                                    <i class="far fa-star rating-star" data-rating="{{ i }}"></i>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="static-stars">
+                                {% for i in 1..5 %}
+                                    {% if i <= averageRating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-info">
+            <div class="info-section">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 class="section-title"><i class="fas fa-code-branch me-2"></i>Expérience</h4>
+                        <p>
+                            {% if developer.experienceLevel == 1 %}
+                                Junior (1-2 ans)
+                            {% elseif developer.experienceLevel == 2 %}
+                                Intermédiaire (2-4 ans)
+                            {% else %}
+                                Senior (5+ ans)
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h4 class="section-title"><i class="fas fa-file-contract me-2"></i>Type de contrat recherché</h4>
+                        <p>{{ developer.preferredContractType }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {% if developer.minimumSalary %}
+            <div class="info-section">
+                <h4 class="section-title"><i class="fas fa-euro-sign me-2"></i>Salaire minimum souhaité</h4>
+                <p>{{ developer.minimumSalary|number_format(0, ',', ' ') }} € brut/an</p>
+            </div>
+            {% endif %}
+
+            <div class="info-section">
+                <h4 class="section-title"><i class="fas fa-user-circle me-2"></i>Bio</h4>
+                <p class="bio-text">{{ developer.bio }}</p>
+            </div>
+
+            <div class="info-section">
+                <h4 class="section-title"><i class="fas fa-laptop-code me-2"></i>Langages de programmation</h4>
+                <div>
+                    {% for language in developer.programmingLanguages %}
+                        <span class="skill-badge">
+                            <i class="fas fa-code me-1"></i>
+                            {{ language }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                {% if not isOwnProfile %}
+                    <button class="btn btn-favorite toggle-favorite" data-type="developer" data-id="{{ developer.id }}">
+                        <i class="{{ is_favorite(developer) ? 'fas' : 'far' }} fa-heart me-1"></i>
+                        {% if is_favorite(developer) %}
+                            Retirer des favoris
+                        {% else %}
+                            Ajouter aux favoris
+                        {% endif %}
+                    </button>
+                {% else %}
+                    <a href="{{ path('app_developer_profile_edit') }}" class="contact-btn">
+                        <i class="fas fa-edit me-2"></i>Modifier mon profil
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+{% if app.user and app.user.developerProfile %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.rating-star');
+    stars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+            const rating = this.dataset.rating;
+            stars.forEach(s => {
+                if (s.dataset.rating <= rating) {
+                    s.classList.remove('far');
+                    s.classList.add('fas');
+                } else {
+                    s.classList.remove('fas');
+                    s.classList.add('far');
+                }
+            });
+        });
+
+        star.addEventListener('mouseout', function() {
+            stars.forEach(s => {
+                s.classList.remove('fas');
+                s.classList.add('far');
+            });
+        });
+
+        star.addEventListener('click', function() {
+            const rating = this.dataset.rating;
+            fetch('{{ path('app_developer_rate', {'id': developer.id}) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `rating=${rating}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById('averageRating').textContent = data.averageRating;
+                    // Désactiver les étoiles après le vote
+                    document.querySelector('.rating-stars').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors de l\'évaluation');
+            });
+        });
+    });
+});
+</script>
+{% endif %}
+{% endblock %}
