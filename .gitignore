@@ -8,8 +8,6 @@
 .env.*.local
 .phpunit.result.cache
 
-# Dossier vendor (géré par Composer)
-/vendor/
 
 # Fichiers de build et uploads
 /public/uploads/
