@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier mon profil{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .edit-form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .programming-languages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .language-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        .language-checkbox:hover {
+            background-color: #f8f9fa;
+        }
+        .language-checkbox input:checked + label {
+            color: #007bff;
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="edit-form-container">
+        <h1 class="text-center mb-4">Modifier mon profil</h1>
+        
+        {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+        
+        {# Informations personnelles #}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Informations personnelles</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form_row(form.firstName) }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form_row(form.lastName) }}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    {{ form_row(form.location) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_row(form.bio) }}
+                </div>
+            </div>
+        </div>
+
+        {# Compétences et expérience #}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Compétences et expérience</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <label class="form-label">{{ form_label(form.programmingLanguages) }}</label>
+                    <div class="programming-languages-grid">
+                        {% for language in form.programmingLanguages %}
+                            <div class="language-checkbox">
+                                {{ form_widget(language) }}
+                                {{ form_label(language) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form_row(form.experienceLevel) }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form_row(form.preferredContractType) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-save me-2"></i>Enregistrer les modifications
+            </button>
+            <a href="{{ path('app_developer_profile') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Retour au profil
+            </a>
+        </div>
+        
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
