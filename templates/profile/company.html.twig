@@ -1,0 +1,150 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord - {{ user.email }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <div class="row">
+        <!-- Colonne de gauche : Informations de l'entreprise -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <h2 class="h4">{{ user.companyProfile.companyName|default(user.email) }}</h2>
+                        <span class="badge bg-primary mb-2">Entreprise</span>
+                        {% if not user.companyProfile or not user.companyProfile.companyName %}
+                            <div class="alert alert-warning mt-3">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Complétez votre profil pour une meilleure visibilité
+                            </div>
+                            <a href="{{ path('app_company_profile_edit') }}" class="btn btn-warning btn-sm mt-2">
+                                <i class="fas fa-user-edit me-1"></i> Compléter le profil
+                            </a>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('app_company_profile_edit') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-1"></i> Modifier le profil
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="h5 mb-3">Statistiques</h3>
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="h3 mb-0">{{ user.companyProfile.jobPosts|length }}</div>
+                            <div class="small text-muted">Offres publiées</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="h3 mb-0">0</div>
+                            <div class="small text-muted">Candidatures</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Colonne de droite : Contenu principal -->
+        <div class="col-md-8">
+            <!-- Section Offres d'emploi -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h3 class="h5 mb-0">Offres d'emploi</h3>
+                            <p class="text-muted small mb-0">
+                                {{ user.companyProfile.jobPosts|length }} offre(s) publiée(s)
+                            </p>
+                        </div>
+                        <div>
+                            <a href="{{ path('app_company_jobs') }}" class="btn btn-outline-primary btn-sm me-2">
+                                <i class="fas fa-list me-1"></i> Voir toutes
+                            </a>
+                            <a href="{{ path('app_company_job_new') }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i> Publier
+                            </a>
+                        </div>
+                    </div>
+
+                    {% if user.companyProfile.jobPosts|length > 0 %}
+                        <div class="list-group">
+                            {% for job in user.companyProfile.jobPosts|slice(0, 3) %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-1">{{ job.title }}</h5>
+                                            <p class="mb-1 small text-muted">
+                                                <i class="fas fa-briefcase me-1"></i> {{ job.contractType }}
+                                                <span class="mx-2">•</span>
+                                                <i class="fas fa-clock me-1"></i> Publié le {{ job.createdAt|date('d/m/Y') }}
+                                            </p>
+                                        </div>
+                                        <div class="btn-group">
+                                            <a href="{{ path('app_company_job_edit', {'id': job.id}) }}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            {% if user.companyProfile.jobPosts|length > 3 %}
+                                <div class="text-center mt-3">
+                                    <a href="{{ path('app_company_jobs') }}" class="btn btn-link">
+                                        Voir les {{ user.companyProfile.jobPosts|length - 3 }} autres offres
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div class="text-muted mb-3">
+                                <i class="fas fa-clipboard fa-3x mb-3 d-block"></i>
+                                <p>Vous n'avez pas encore publié d'offres d'emploi</p>
+                            </div>
+                            <a href="{{ path('app_company_job_new') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i> Publier votre première offre
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Section Candidatures récentes -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="h5 mb-0">Candidatures récentes</h3>
+                    </div>
+                    <div class="text-center py-4">
+                        <div class="text-muted">
+                            <i class="fas fa-users fa-3x mb-3 d-block"></i>
+                            <p>Aucune candidature pour le moment</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

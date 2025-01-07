@@ -10,33 +10,85 @@ AdopteUnDev est une plateforme web développée avec Symfony qui permet de mettr
 - Système de matching basé sur les compétences
 - Messagerie entre développeurs et entreprises
 
-## Installation
+## 🚀 Installation
 
-1. Cloner le projet
+### Prérequis
+- PHP 8.1 ou supérieur
+- Composer
+- Symfony CLI
+- MySQL ou MariaDB
+- Node.js et npm
+
+### Étapes d'installation
+
+1. **Cloner le projet**
 ```bash
 git clone https://github.com/Ayovo9/Projet-Symfony-AdopteUnDev.git
+cd Projet-Symfony-AdopteUnDev
 ```
 
-2. Installer les dépendances
+2. **Installer les dépendances PHP**
 ```bash
 composer install
 ```
 
-3. Configurer la base de données dans .env
-```
-DATABASE_URL="mysql://root:@127.0.0.1:3306/adopteundev?serverVersion=8.0.32&charset=utf8mb4"
+3. **Installer les dépendances JavaScript**
+```bash
+npm install
+npm run build
 ```
 
-4. Créer la base de données et exécuter les migrations
+4. **Configurer la base de données**
+- Copier le fichier .env en .env.local
+- Modifier la ligne DATABASE_URL avec vos informations de connexion
+
+5. **Créer la base de données et les tables**
 ```bash
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
 ```
 
-5. Charger les fixtures (données de test)
+6. **Charger les données de test (optionnel)**
 ```bash
 php bin/console doctrine:fixtures:load
 ```
+
+7. **Démarrer le serveur**
+```bash
+symfony server:start
+```
+
+Le site sera accessible à l'adresse : `http://localhost:8000`
+
+## 👥 Comptes de test
+
+### Compte Développeur
+- Email : dev@test.com
+- Mot de passe : password123
+
+### Compte Entreprise
+- Email : company@test.com
+- Mot de passe : password123
+
+## 🛠 Fonctionnalités
+
+### Pour les Développeurs
+- Création et gestion de profil
+- Système de matching avec les offres
+- Gestion des favoris
+
+### Pour les Entreprises
+- Gestion du profil entreprise
+- Publication d'offres d'emploi
+- Recherche de développeurs
+
+## 🤝 Contribution
+Le projet est divisé en deux branches principales de développement :
+- `dev-amevi` : Fonctionnalités développeurs
+- `dev-victor` : Fonctionnalités entreprises
+
+## 📝 Licence
+Ce projet est développé dans le cadre d'un projet universitaire.
 
 ## Structure des Branches
 - `main` : Version stable de production

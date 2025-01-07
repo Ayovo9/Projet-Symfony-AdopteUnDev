@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Compléter mon profil - {{ app.user.email }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+    
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h1 class="h3 mb-4">Compléter mon profil</h1>
+
+                    {{ form_start(form) }}
+                    
+                    <div class="mb-3">
+                        {{ form_row(form.name) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_row(form.location) }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ form_label(form.programmingLanguages) }}</label>
+                        <div class="row">
+                            {% for language in form.programmingLanguages %}
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check">
+                                        {{ form_widget(language) }}
+                                        {{ form_label(language) }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_row(form.experienceLevel) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_row(form.minSalary) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_row(form.bio) }}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                        <a href="{{ path('app_profile') }}" class="btn btn-outline-secondary">Retour au profil</a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

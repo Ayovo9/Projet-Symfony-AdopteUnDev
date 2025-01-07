@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bienvenue sur {{ controller_name }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="display-4 mb-4">Bienvenue sur {{ controller_name }}</h1>
+            <p class="lead mb-5">La plateforme qui connecte les développeurs et les entreprises</p>
+            
+            {% if not app.user %}
+                <div class="row justify-content-center mt-4">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h2 class="h4 mb-4">Connexion</h2>
+                                
+                                <div class="d-grid gap-2">
+                                    <a href="{{ path('app_login') }}" class="btn btn-primary btn-lg mb-3">Se connecter</a>
+                                    <a href="{{ path('app_register') }}" class="btn btn-outline-primary btn-lg">Créer un compte</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="row justify-content-center mt-4">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h2 class="h4 mb-4">Bienvenue {{ app.user.email }}</h2>
+                                
+                                {% if 'ROLE_DEV' in app.user.roles %}
+                                    <p>Vous êtes connecté en tant que développeur</p>
+                                {% else %}
+                                    <p>Vous êtes connecté en tant qu'entreprise</p>
+                                {% endif %}
+                                
+                                <div class="d-grid gap-2">
+                                    <a href="{{ path('app_logout') }}" class="btn btn-danger btn-lg">Se déconnecter</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
