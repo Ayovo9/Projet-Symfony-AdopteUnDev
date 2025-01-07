@@ -1,0 +1,157 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Offres d'emploi correspondantes{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .match-card {
+            transition: transform 0.2s;
+            margin-bottom: 1.5rem;
+        }
+        .match-card:hover {
+            transform: translateY(-5px);
+        }
+        .match-score {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+        }
+        .score-high {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        .score-medium {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+        .score-low {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+        .skill-badge {
+            font-size: 0.85rem;
+            padding: 0.35rem 0.75rem;
+            margin: 0.25rem;
+            border-radius: 20px;
+            background-color: #e9ecef;
+            color: #495057;
+            border: 1px solid #dee2e6;
+        }
+        .match-header {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        .company-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .salary-badge {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .contract-badge {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="match-header">
+        <div class="container">
+            <h1 class="display-4 mb-3">Offres d'emploi correspondantes</h1>
+            <p class="lead mb-0">
+                Découvrez les offres qui correspondent le mieux à votre profil
+            </p>
+        </div>
+    </div>
+
+    <div class="container">
+        {% if matches|length > 0 %}
+            <div class="row">
+                {% for match in matches %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card match-card shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ asset('images/company-default.png') }}" 
+                                             alt="{{ match.job.company.name }}" 
+                                             class="company-logo me-3">
+                                        <div>
+                                            <h5 class="card-title mb-1">{{ match.job.title }}</h5>
+                                            <p class="text-muted mb-0">
+                                                {{ match.job.company.name }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="match-score {% if match.score >= 75 %}score-high{% elseif match.score >= 50 %}score-medium{% else %}score-low{% endif %}">
+                                        {{ match.score|round }}%
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="d-flex flex-wrap gap-2 mb-2">
+                                        <span class="contract-badge">
+                                            <i class="fas fa-briefcase me-1"></i>{{ match.job.contractType }}
+                                        </span>
+                                        {% if match.job.salary %}
+                                            <span class="salary-badge">
+                                                <i class="fas fa-euro-sign me-1"></i>{{ match.job.salary }}k€/an
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-map-marker-alt me-2"></i>{{ match.job.location }}
+                                    </p>
+                                </div>
+
+                                <div class="mb-3">
+                                    {% for skill in match.job.programmingLanguages %}
+                                        <span class="skill-badge">{{ skill }}</span>
+                                    {% endfor %}
+                                </div>
+
+                                <p class="card-text mb-3">
+                                    {{ match.job.description|slice(0, 150) }}...
+                                </p>
+
+                                <div class="d-grid gap-2">
+                                    <a href="{{ path('app_job_show', {'id': match.job.id}) }}" 
+                                       class="btn btn-primary">
+                                        <i class="fas fa-eye me-2"></i>Voir l'offre
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h3>Aucune offre correspondante trouvée</h3>
+                <p class="text-muted">
+                    Nous n'avons pas trouvé d'offres correspondant à votre profil pour le moment.
+                    Revenez plus tard pour découvrir de nouvelles opportunités !
+                </p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
