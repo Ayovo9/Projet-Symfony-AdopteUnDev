@@ -8,7 +8,6 @@ AdopteUnDev est une plateforme web développée avec Symfony qui permet de mettr
 - Création et gestion de profils détaillés
 - Publication et recherche d'offres d'emploi
 - Système de matching basé sur les compétences
-- Messagerie entre développeurs et entreprises
 
 ## 🚀 Installation
 
@@ -87,9 +86,6 @@ Le projet est divisé en deux branches principales de développement :
 - `dev-amevi` : Fonctionnalités développeurs
 - `dev-victor` : Fonctionnalités entreprises
 
-## 📝 Licence
-Ce projet est développé dans le cadre d'un projet universitaire.
-
 ## Structure des Branches
 - `main` : Version stable de production
 - `dev-amevi` : Branche de développement pour Amevi
@@ -102,21 +98,6 @@ Ce projet est développé dans le cadre d'un projet universitaire.
 4. Créer une Pull Request vers main quand la fonctionnalité est prête
 5. Faire valider la PR par l'autre développeur avant de merger
 
-## Répartition du Travail
-### Amevi
-- [Liste des fonctionnalités attribuées à Amevi]
-
-### Victor
-- [Liste des fonctionnalités attribuées à Victor]
-
-## Convention de Nommage des Commits
-- feat: Nouvelle fonctionnalité
-- fix: Correction de bug
-- docs: Documentation
-- style: Formatage, semicolons manquants, etc.
-- refactor: Refactorisation du code
-- test: Ajout ou modification de tests
-
 ## Contacts
-- Amevi : [Email]
-- Victor : [Email]
+- Amevi : amevi.yovo@etudiant.univ-rennes.fr
+- Victor : victor.degas@etudiant.univ-rennes.fr
