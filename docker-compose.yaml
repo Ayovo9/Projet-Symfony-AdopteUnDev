@@ -1,0 +1,42 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    volumes:
+      - .:/var/www:rw,cached
+    ports:
+      - "8000:8000" # Accès local
+    depends_on:
+      - database
+
+  database:
+    image: mysql:8.0 # Version MySQL
+    environment:
+      MYSQL_ROOT_PASSWORD: root       # Mot de passe root (changez-le en prod)
+      MYSQL_DATABASE: adopteundev     # Nom de la base de données
+      MYSQL_USER: root            # Utilisateur MySQL
+      MYSQL_PASSWORD:     # Mot de passe utilisateur
+    ports:
+      - "3306:3306" # Port par défaut pour MySQL
+    volumes:
+      - mysql_data:/var/lib/mysql:rw # Volume pour la persistance des données
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: database
+      PMA_USER: dev_user
+      PMA_PASSWORD: dev_password
+    ports:
+      - "8080:80" # Accès PhpMyAdmin via localhost:8080
+    depends_on:
+      - database
+
+volumes:
+  mysql_data:

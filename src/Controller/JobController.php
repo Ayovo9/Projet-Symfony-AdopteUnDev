@@ -37,7 +37,7 @@ class JobController extends AbstractController
             $this->entityManager->flush();
 
             // Chercher les développeurs qui correspondent et les notifier
-            $this->matchingNotificationService->checkNewMatchesForJob($job);
+            $this->matchingNotificationService->checkNewMatchesForJobPost($job);
 
             $this->addFlash('success', 'Votre offre a été publiée avec succès !');
             return $this->redirectToRoute('app_company_dashboard');
@@ -83,7 +83,7 @@ class JobController extends AbstractController
             $this->entityManager->flush();
 
             // Vérifier les nouveaux matchs après la modification
-            $this->matchingNotificationService->checkNewMatchesForJob($job);
+            $this->matchingNotificationService->checkNewMatchesForJobPost($job);
 
             $this->addFlash('success', 'Votre offre a été mise à jour avec succès !');
             return $this->redirectToRoute('app_company_dashboard');
