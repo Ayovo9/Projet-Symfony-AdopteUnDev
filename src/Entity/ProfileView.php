@@ -22,7 +22,7 @@ class ProfileView
     private ?CompanyProfile $company = null;
 
     #[ORM\ManyToOne(targetEntity: JobPost::class)]
-    #[ORM\JoinColumn(name: 'job_post_id', referencedColumnName: 'id', nullable: false)]
+    #[ORM\JoinColumn(name: 'job_post_id', referencedColumnName: 'id', nullable: true, onDelete: "SET NULL")]
     private ?JobPost $jobPost = null;
 
     #[ORM\Column]
