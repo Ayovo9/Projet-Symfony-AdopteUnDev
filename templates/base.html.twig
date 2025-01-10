@@ -171,42 +171,42 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto">
-                        {% if is_granted('ROLE_USER') %}
-                            
+                    {% if is_granted('ROLE_USER') %}
+                        <ul class="navbar-nav me-auto">
                             {% if is_granted('ROLE_DEVELOPER') %}
                                 <li class="nav-item">
-                                    {% if is_granted('ROLE_DEVELOPER') %}
-                                        <a class="nav-link{% if app.request.get('_route') == 'app_developer_dashboard' %} active{% endif %}" href="{{ path('app_developer_dashboard') }}">
-                                            <i class="fas fa-handshake me-1"></i>
-                                            Mes Matchs
-                                        </a>
-                                    {% elseif is_granted('ROLE_COMPANY') %}
-                                        <a class="nav-link{% if app.request.get('_route') == 'app_company_dashboard' %} active{% endif %}" href="{{ path('app_company_dashboard') }}">
-                                            <i class="fas fa-handshake me-1"></i>
-                                            Mes Matchs
-                                        </a>
-                                    {% endif %}
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link{% if app.request.get('_route') == 'app_developer_social' %} active{% endif %}" href="{{ path('app_developer_social') }}">
-                                        <i class="fas fa-users me-1"></i>
-                                        Espace Social
+                                    <a class="nav-link{% if app.request.get('_route') == 'app_developer_dashboard' %} active{% endif %}" href="{{ path('app_developer_dashboard') }}">
+                                        <i class="fas fa-chart-line me-1"></i>
+                                        Tableau de bord
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link{% if app.request.get('_route') == 'app_jobs_browse' %} active{% endif %}" href="{{ path('app_jobs_browse') }}">
                                         <i class="fas fa-briefcase me-1"></i>
-                                        Offres d'emploi
+                                        Offres
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link{% if app.request.get('_route') == 'app_developer_social' %} active{% endif %}" href="{{ path('app_developer_social') }}">
+                                        <i class="fas fa-users me-1"></i>
+                                        Social
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link {% if app.request.get('_route') == 'app_my_applications' %}active{% endif %}" href="{{ path('app_my_applications') }}">
-                                        <i class="fas fa-file-alt"></i> Mes candidatures
+                                        <i class="fas fa-file-alt me-1"></i>
+                                        Candidatures
                                     </a>
                                 </li>
                             {% endif %}
+
                             {% if is_granted('ROLE_COMPANY') %}
+                                <li class="nav-item">
+                                    <a class="nav-link{% if app.request.get('_route') == 'app_company_dashboard' %} active{% endif %}" href="{{ path('app_company_dashboard') }}">
+                                        <i class="fas fa-chart-line me-1"></i>
+                                        Tableau de bord
+                                    </a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link{% if app.request.get('_route') == 'app_company_developers_search' %} active{% endif %}" href="{{ path('app_company_developers_search') }}">
                                         <i class="fas fa-search me-1"></i>
@@ -215,22 +215,25 @@
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link {% if app.request.get('_route') == 'app_company_applications' %}active{% endif %}" href="{{ path('app_company_applications') }}">
-                                        <i class="fas fa-inbox"></i> Candidatures reçues
+                                        <i class="fas fa-inbox me-1"></i>
+                                        Candidatures
                                     </a>
                                 </li>
                             {% endif %}
+
                             <li class="nav-item">
                                 <a class="nav-link{% if app.request.get('_route') in ['app_favorite_list', 'app_company_favorites'] %} active{% endif %}" href="{{ is_granted('ROLE_COMPANY') ? path('app_company_favorites') : path('app_favorite_list') }}">
-                                    <i class="fas fa-heart me-1"></i>
+                                    <i class="fas fa-heart me-1" style="color: #ff4d4d"></i>
                                     Favoris
                                 </a>
                             </li>
-                        {% endif %}
-                    </ul>
-                    <ul class="navbar-nav">
-                        {% if app.user %}
-                            <div class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        </ul>
+
+                        <!-- Right side navigation -->
+                        <ul class="navbar-nav ms-auto d-flex align-items-center">
+                            <!-- Notifications -->
+                            <li class="nav-item dropdown me-2">
+                                <a class="nav-link" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-bell"></i>
                                     <span class="badge bg-danger notification-count"></span>
                                 </a>
@@ -245,18 +248,26 @@
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item text-center" href="{{ path('app_notifications_index') }}">Voir toutes les notifications</a>
                                 </div>
-                            </div>
-                            <a class="nav-link" href="{{ path('app_search_history_index') }}">
-                                <i class="fas fa-history"></i> Historique
-                            </a>
-                            <div class="nav-item dropdown">
+                            </li>
+
+                            <!-- History -->
+                            <li class="nav-item me-2">
+                                <a class="nav-link" href="{{ path('app_search_history_index') }}" title="Historique">
+                                    <i class="fas fa-history"></i>
+                                </a>
+                            </li>
+
+                            <!-- User Profile -->
+                            <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                                     <i class="fas fa-user-circle me-2"></i>
-                                    {% if is_granted('ROLE_DEVELOPER') %}
-                                        {{ app.user.developerProfile.firstName }} {{ app.user.developerProfile.lastName }}
-                                    {% else %}
-                                        {{ app.user.companyProfile.name }}
-                                    {% endif %}
+                                    <span class="d-none d-lg-inline">
+                                        {% if is_granted('ROLE_DEVELOPER') %}
+                                            {{ app.user.developerProfile.firstName }} {{ app.user.developerProfile.lastName }}
+                                        {% else %}
+                                            {{ app.user.companyProfile.name }}
+                                        {% endif %}
+                                    </span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     {% if is_granted('ROLE_DEVELOPER') %}
@@ -279,8 +290,11 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </div>
-                        {% else %}
+                            </li>
+                        </ul>
+                    {% else %}
+                        <!-- Login/Register buttons for non-authenticated users -->
+                        <ul class="navbar-nav ms-auto">
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ path('app_login') }}">
                                     <i class="fas fa-sign-in-alt me-2"></i>Connexion
@@ -291,8 +305,8 @@
                                     <i class="fas fa-user-plus me-2"></i>Inscription
                                 </a>
                             </li>
-                        {% endif %}
-                    </ul>
+                        </ul>
+                    {% endif %}
                 </div>
             </div>
         </nav>

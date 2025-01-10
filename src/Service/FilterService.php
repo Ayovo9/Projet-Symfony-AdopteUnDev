@@ -19,7 +19,7 @@ class FilterService
         }
 
         if (!empty($filters['minSalary'])) {
-            $qb->andWhere('j.salaryMin >= :minSalary')
+            $qb->andWhere('j.salary >= :minSalary')
                ->setParameter('minSalary', $filters['minSalary']);
         }
 
