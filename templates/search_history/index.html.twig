@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique des recherches{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h3 mb-0">Historique des recherches</h1>
+            </div>
+
+            {% if search_history is empty %}
+                <div class="card-body">
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aucun historique de recherche disponible.
+                    </div>
+                </div>
+            {% else %}
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for search in search_history %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">
+                                            <i class="fas fa-search me-2 text-primary"></i>
+                                            {% if search.searchQuery %}
+                                                "{{ search.searchQuery }}"
+                                            {% else %}
+                                                <span class="text-muted">Recherche sans terme</span>
+                                            {% endif %}
+                                        </h5>
+                                        {% if search.filters|length > 0 %}
+                                            <div class="mt-2">
+                                                <small class="text-muted">Filtres appliqués :</small>
+                                                <div class="mt-1">
+                                                    {% for key, value in search.filters %}
+                                                        {% if value is not null and value != '' %}
+                                                            <span class="badge bg-light text-dark me-2 mb-1">
+                                                                {{ key }}: 
+                                                                {% if value is iterable %}
+                                                                    {{ value|join(', ') }}
+                                                                {% else %}
+                                                                    {{ value }}
+                                                                {% endif %}
+                                                            </span>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-muted ms-3">
+                                        <i class="far fa-clock me-1"></i>
+                                        {{ search.searchedAt|date('d/m/Y H:i') }}
+                                    </small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Ajout des styles spécifiques #}
+    <style>
+        .list-group-item:hover {
+            background-color: #f8f9fa;
+        }
+        .badge {
+            font-size: 0.85em;
+            padding: 0.4em 0.8em;
+            border-radius: 20px;
+        }
+    </style>
+{% endblock %}

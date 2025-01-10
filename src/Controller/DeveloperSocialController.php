@@ -5,21 +5,26 @@ namespace App\Controller;
 use App\Entity\DeveloperProfile;
 use App\Entity\DeveloperRating;
 use App\Form\DeveloperSearchType;
+use App\Service\SearchHistoryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/developer/social')]
+#[IsGranted('ROLE_DEVELOPER')]
 class DeveloperSocialController extends AbstractController
 {
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
+    private SearchHistoryService $searchHistoryService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, SearchHistoryService $searchHistoryService)
     {
         $this->entityManager = $entityManager;
+        $this->searchHistoryService = $searchHistoryService;
     }
 
     #[Route('/', name: 'app_developer_social')]
@@ -41,6 +46,15 @@ class DeveloperSocialController extends AbstractController
                 ->setParameter('exactSearch', $searchTerm)
                 ->getQuery()
                 ->getResult();
+
+            // Log the search
+            if ($this->getUser()) {
+                $this->searchHistoryService->logSearch(
+                    $this->getUser(),
+                    $searchTerm,
+                    []
+                );
+            }
         }
 
         return $this->render('developer/social/index.html.twig', [

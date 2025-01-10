@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Notifications</h1>
+
+        {% if notifications is empty %}
+            <div class="alert alert-info">
+                Aucune notification disponible.
+            </div>
+        {% else %}
+            <div class="list-group">
+                {% for notification in notifications %}
+                    <div class="list-group-item {% if not notification.isRead %}list-group-item-primary{% endif %}"
+                         data-notification-id="{{ notification.id }}">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ notification.message }}</h5>
+                            <small>{{ notification.createdAt|date('d/m/Y H:i') }}</small>
+                        </div>
+                        {% if notification.data %}
+                            <p class="mb-1">
+                                {% if notification.type == 'new_job_match' %}
+                                    <a href="{{ path('app_job_show', {'id': notification.data.jobId}) }}" class="btn btn-sm btn-primary">
+                                        Voir l'offre
+                                    </a>
+                                {% elseif notification.type == 'new_developer_match' %}
+                                    <a href="{{ path('app_developer_show', {'id': notification.data.developerId}) }}" class="btn btn-sm btn-primary">
+                                        Voir le profil
+                                    </a>
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[data-notification-id]').forEach(function(element) {
+        if (!element.classList.contains('list-group-item-primary')) {
+            return;
+        }
+
+        element.addEventListener('click', function() {
+            const notificationId = this.dataset.notificationId;
+            fetch(`/notifications/${notificationId}/mark-read`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    element.classList.remove('list-group-item-primary');
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

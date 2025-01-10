@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\DeveloperProfile;
 use App\Form\DeveloperFilterType;
+use App\Service\SearchHistoryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,11 +16,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_COMPANY')]
 class CompanyDeveloperSearchController extends AbstractController
 {
-    private $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private SearchHistoryService $searchHistoryService
+    ) {
     }
 
     #[Route('/developers/search', name: 'app_company_developers_search')]
@@ -33,6 +33,7 @@ class CompanyDeveloperSearchController extends AbstractController
             ->leftJoin('d.user', 'u')
             ->orderBy('d.createdAt', 'DESC');
 
+        $filters = [];
         if ($filterForm->isSubmitted() && $filterForm->isValid()) {
             $filters = $filterForm->getData();
 
@@ -48,13 +49,29 @@ class CompanyDeveloperSearchController extends AbstractController
                 $qb->andWhere('d.location LIKE :location')
                     ->setParameter('location', '%' . $filters['location'] . '%');
             }
+
+            if (!empty($filters['programmingLanguages'])) {
+                $qb->andWhere('JSON_CONTAINS(d.programmingLanguages, :languages) = 1')
+                    ->setParameter('languages', json_encode($filters['programmingLanguages']));
+            }
+
+            // Log the search
+            if ($this->getUser()) {
+                $query = $filters['name'] ?? '';
+                unset($filters['name']); // Remove name from filters as it's our main query
+                $this->searchHistoryService->logSearch(
+                    $this->getUser(),
+                    $query,
+                    $filters
+                );
+            }
         }
 
         $developers = $qb->getQuery()->getResult();
 
         return $this->render('company/developer_search.html.twig', [
+            'form' => $filterForm->createView(),
             'developers' => $developers,
-            'filterForm' => $filterForm->createView()
         ]);
     }
 }

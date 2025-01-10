@@ -137,44 +137,19 @@
                                     <div class="match-score {{ match.score >= 75 ? 'score-high' : (match.score >= 50 ? 'score-medium' : 'score-low') }}">
                                         {{ match.score }}%
                                     </div>
-                                    {% if match.developer.avatar %}
-                                        <img src="{{ asset('uploads/avatars/' ~ match.developer.avatar) }}" 
-                                             alt="{{ match.developer.firstName }}" 
-                                             class="dev-avatar">
-                                    {% else %}
-                                        <img src="{{ asset('images/default-avatar.svg') }}" 
-                                             alt="{{ match.developer.firstName }}" 
-                                             class="dev-avatar">
-                                    {% endif %}
-                                    <div>
-                                        <h4 class="mb-1">{{ match.developer.firstName }} {{ match.developer.lastName }}</h4>
-                                        <p class="text-muted mb-2">
-                                            {% if match.developer.title %}
-                                                {{ match.developer.title }}
-                                            {% else %}
-                                                {% if match.developer.experienceLevel == 1 %}
-                                                    Développeur Junior
-                                                {% elseif match.developer.experienceLevel == 2 %}
-                                                    Développeur Intermédiaire
-                                                {% else %}
-                                                    Développeur Senior
-                                                {% endif %}
-                                            {% endif %}
-                                        </p>
-                                        <div class="dev-contact">
-                                            <a href="mailto:{{ match.developer.user.email }}" class="social-link">
-                                                <i class="fas fa-envelope"></i>
-                                            </a>
-                                            {% if match.developer.github %}
-                                                <a href="{{ match.developer.github }}" target="_blank" class="social-link">
-                                                    <i class="fab fa-github"></i>
-                                                </a>
-                                            {% endif %}
-                                            {% if match.developer.linkedin %}
-                                                <a href="{{ match.developer.linkedin }}" target="_blank" class="social-link">
-                                                    <i class="fab fa-linkedin"></i>
-                                                </a>
-                                            {% endif %}
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                {{ include('partials/_developer_avatar.html.twig', { developer: match.developer }) }}
+                                                <div class="ms-3">
+                                                    <h5 class="card-title mb-1">
+                                                        {{ match.developer.firstName }} {{ match.developer.lastName }}
+                                                    </h5>
+                                                    {% if match.developer.title %}
+                                                        <p class="text-muted mb-0">{{ match.developer.title }}</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

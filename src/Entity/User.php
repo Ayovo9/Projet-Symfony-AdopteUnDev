@@ -35,6 +35,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTime $lastLoginAt = null;
+
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?DeveloperProfile $developerProfile = null;
 
@@ -44,8 +47,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: JobPost::class, cascade: ['persist', 'remove'])]
     private Collection $jobPosts;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notification::class, orphanRemoval: true)]
+    private Collection $notifications;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: SearchHistory::class, orphanRemoval: true)]
+    private Collection $searchHistories;
+
     public function __construct()
     {
+        $this->notifications = new ArrayCollection();
+        $this->searchHistories = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->jobPosts = new ArrayCollection();
     }
@@ -123,6 +134,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getLastLoginAt(): ?\DateTime
+    {
+        return $this->lastLoginAt;
+    }
+
+    public function setLastLoginAt(?\DateTime $lastLoginAt): static
+    {
+        $this->lastLoginAt = $lastLoginAt;
+        return $this;
+    }
+
     public function getDeveloperProfile(): ?DeveloperProfile
     {
         return $this->developerProfile;
@@ -188,6 +210,60 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Notification>
+     */
+    public function getNotifications(): Collection
+    {
+        return $this->notifications;
+    }
+
+    public function addNotification(Notification $notification): static
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeNotification(Notification $notification): static
+    {
+        if ($this->notifications->removeElement($notification)) {
+            if ($notification->getUser() === $this) {
+                $notification->setUser(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SearchHistory>
+     */
+    public function getSearchHistories(): Collection
+    {
+        return $this->searchHistories;
+    }
+
+    public function addSearchHistory(SearchHistory $searchHistory): static
+    {
+        if (!$this->searchHistories->contains($searchHistory)) {
+            $this->searchHistories->add($searchHistory);
+            $searchHistory->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeSearchHistory(SearchHistory $searchHistory): static
+    {
+        if ($this->searchHistories->removeElement($searchHistory)) {
+            if ($searchHistory->getUser() === $this) {
+                $searchHistory->setUser(null);
+            }
+        }
         return $this;
     }
 }

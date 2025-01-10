@@ -1,0 +1,186 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord - {{ parent() }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .dashboard-container {
+            padding: 2rem;
+        }
+        .dashboard-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .notification-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s;
+        }
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        .notification-item.unread {
+            background-color: #f8f9fa;
+        }
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+        .notification-meta {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        .search-history-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+        .search-history-item:last-child {
+            border-bottom: none;
+        }
+        .search-query {
+            font-weight: 500;
+        }
+        .search-meta {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        .action-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .action-button:hover {
+            background-color: #0056b3;
+        }
+        .badge {
+            background-color: #dc3545;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50%;
+            font-size: 0.75rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="dashboard-container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="dashboard-section">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2>Notifications {% if unreadNotificationsCount > 0 %}<span class="badge">{{ unreadNotificationsCount }}</span>{% endif %}</h2>
+                        {% if notifications|length > 0 %}
+                            <button class="action-button" id="markAllRead">Tout marquer comme lu</button>
+                        {% endif %}
+                    </div>
+                    {% if notifications|length > 0 %}
+                        <div id="notifications-list">
+                            {% for notification in notifications %}
+                                <div class="notification-item {% if not notification.isRead %}unread{% endif %}">
+                                    <div class="notification-content">
+                                        {{ notification.message }}
+                                    </div>
+                                    <div class="notification-meta">
+                                        {{ notification.createdAt|date('d/m/Y H:i') }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>Aucune notification</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="dashboard-section">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2>Historique des recherches</h2>
+                        {% if recentSearches|length > 0 %}
+                            <button class="action-button" id="clearHistory">Effacer l'historique</button>
+                        {% endif %}
+                    </div>
+                    {% if recentSearches|length > 0 %}
+                        <div id="search-history-list">
+                            {% for search in recentSearches %}
+                                <div class="search-history-item">
+                                    <div class="search-query">
+                                        {{ search.searchQuery }}
+                                    </div>
+                                    <div class="search-meta">
+                                        {{ search.searchedAt|date('d/m/Y H:i') }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>Aucune recherche récente</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const markAllReadBtn = document.getElementById('markAllRead');
+            const clearHistoryBtn = document.getElementById('clearHistory');
+
+            if (markAllReadBtn) {
+                markAllReadBtn.addEventListener('click', function() {
+                    fetch('{{ path('app_notifications_mark_read') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.querySelectorAll('.notification-item.unread').forEach(item => {
+                                item.classList.remove('unread');
+                            });
+                            const badge = document.querySelector('.badge');
+                            if (badge) {
+                                badge.remove();
+                            }
+                        }
+                    });
+                });
+            }
+
+            if (clearHistoryBtn) {
+                clearHistoryBtn.addEventListener('click', function() {
+                    if (confirm('Êtes-vous sûr de vouloir effacer tout l\'historique des recherches ?')) {
+                        fetch('{{ path('app_search_history_clear') }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const historyList = document.getElementById('search-history-list');
+                                if (historyList) {
+                                    historyList.innerHTML = '<p>Aucune recherche récente</p>';
+                                }
+                                clearHistoryBtn.style.display = 'none';
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

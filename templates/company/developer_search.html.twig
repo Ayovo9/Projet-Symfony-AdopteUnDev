@@ -6,68 +6,55 @@
     {{ parent() }}
     <style>
         .search-header {
-            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-            padding: 3rem 0;
+            background-color: #f8f9fa;
+            padding: 2rem 0;
             margin-bottom: 2rem;
-            border-radius: 1rem;
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
         .search-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
+            background: white;
+            border-radius: 8px;
             padding: 2rem;
-            margin-top: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .search-card .form-label {
-            color: white;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-        .search-card .form-control {
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-        }
-        .search-card .form-control:focus {
-            background: white;
-            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
-        }
-        .search-card .btn-search {
-            background: white;
-            color: #4e73df;
-            border: none;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        .search-card .btn-search:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .developer-card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            margin-bottom: 1.5rem;
             transition: transform 0.2s;
+            margin-bottom: 1.5rem;
         }
         .developer-card:hover {
             transform: translateY(-5px);
         }
-        .skill-badge {
-            background: rgba(78, 115, 223, 0.1);
-            color: #4e73df;
-            border-radius: 20px;
-            padding: 0.25rem 0.75rem;
+        .developer-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .developer-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            object-fit: cover;
+        }
+        .developer-info {
+            flex-grow: 1;
+        }
+        .programming-language-badge {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 15px;
             font-size: 0.875rem;
             margin-right: 0.5rem;
             margin-bottom: 0.5rem;
             display: inline-block;
+        }
+        .location-text {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .created-at {
+            color: #6c757d;
+            font-size: 0.8rem;
         }
     </style>
 {% endblock %}
@@ -77,40 +64,38 @@
         <div class="container">
             <h1 class="h2 mb-4 ms-4">Recherche de développeurs</h1>
             <div class="search-card">
-                {{ form_start(filterForm, {'attr': {'class': 'row g-4'}}) }}
+                {{ form_start(form, {'attr': {'class': 'row g-4'}}) }}
                     <div class="col-md-6">
                         <div class="form-group">
-                            {{ form_label(filterForm.name) }}
-                            {{ form_widget(filterForm.name, {
+                            {{ form_label(form.name) }}
+                            {{ form_widget(form.name, {
                                 'attr': {
-                                    'class': 'form-control',
-                                    'placeholder': 'Ex: John Doe'
+                                    'class': 'form-control'
                                 }
                             }) }}
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            {{ form_label(filterForm.location) }}
-                            {{ form_widget(filterForm.location, {
+                            {{ form_label(form.location) }}
+                            {{ form_widget(form.location, {
                                 'attr': {
-                                    'class': 'form-control',
-                                    'placeholder': 'Ex: Paris'
+                                    'class': 'form-control'
                                 }
                             }) }}
                         </div>
                     </div>
-                    <div class="col-12 text-center mt-4">
-                        <button type="submit" class="btn btn-search">
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary">
                             <i class="fas fa-search me-2"></i>Rechercher
                         </button>
                     </div>
-                {{ form_end(filterForm) }}
+                {{ form_end(form) }}
             </div>
         </div>
     </div>
 
-    <div class="container mt-4">
+    <div class="container">
         <div class="row">
             {% if developers is empty %}
                 <div class="col-12">
@@ -123,25 +108,41 @@
                     <div class="col-md-6 col-lg-4">
                         <div class="card developer-card">
                             <div class="card-body">
-                                <h5 class="card-title">{{ developer.firstName }} {{ developer.lastName }}</h5>
-                                {% if developer.location %}
-                                    <p class="card-text">
-                                        <i class="fas fa-map-marker-alt me-2"></i>{{ developer.location }}
-                                    </p>
-                                {% endif %}
-                                
+                                <div class="developer-header">
+                                    {{ include('partials/_developer_avatar.html.twig', { developer: developer }) }}
+                                    <div class="developer-info">
+                                        <h5 class="card-title mb-1">
+                                            {{ developer.firstName }} {{ developer.lastName }}
+                                        </h5>
+                                        {% if developer.title %}
+                                            <p class="card-subtitle mb-2 text-muted">{{ developer.title }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
                                 {% if developer.programmingLanguages %}
-                                    <div class="mt-3">
+                                    <div class="mb-3">
                                         {% for language in developer.programmingLanguages %}
-                                            <span class="skill-badge">{{ language }}</span>
+                                            <span class="programming-language-badge">{{ language }}</span>
                                         {% endfor %}
                                     </div>
                                 {% endif %}
 
-                                <div class="mt-3">
+                                {% if developer.location %}
+                                    <p class="location-text mb-2">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        {{ developer.location }}
+                                    </p>
+                                {% endif %}
+
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <small class="created-at">
+                                        <i class="far fa-clock me-1"></i>
+                                        Inscrit le {{ developer.createdAt|date('d/m/Y') }}
+                                    </small>
                                     <a href="{{ path('app_company_view_developer', {'jobId': 201, 'developerId': developer.id}) }}" 
-                                       class="btn btn-primary">
-                                        <i class="fas fa-eye me-2"></i>Voir le profil
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i>Voir le profil
                                     </a>
                                 </div>
                             </div>
