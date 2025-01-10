@@ -7,6 +7,7 @@
         {% block stylesheets %}
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+            <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Orbitron:wght@700&display=swap" rel="stylesheet">
             <style>
                 .navbar {
                     background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
@@ -16,24 +17,42 @@
                 .navbar-brand {
                     display: flex;
                     align-items: center;
-                    gap: 0.5rem;
-                    color: white !important;
-                    font-weight: 600;
-                    font-size: 1.3rem;
+                    gap: 0.8rem;
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 1.6rem;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    padding: 0.5rem 0;
+                    transition: all 0.3s ease;
+                    background: linear-gradient(to right, #00ff87 0%, #60efff 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    text-shadow: none;
+                    font-weight: 700;
+                    margin-right: 2rem;
+                    margin-left: -0.5rem;
+                }
+                .navbar-brand:hover {
+                    transform: scale(1.05);
+                    background: linear-gradient(to right, #60efff 0%, #00ff87 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
                 }
                 .navbar-brand img {
                     width: 40px;
                     height: 40px;
+                    filter: hue-rotate(90deg) brightness(1.2) drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
                 }
                 .navbar-nav .nav-item {
                     margin-right: 1rem;
                 }
                 .nav-link {
                     color: rgba(255,255,255,0.9) !important;
-                    font-weight: 500;
+                    font-weight: 600 !important;
                     padding: 0.5rem 1rem !important;
                     border-radius: 20px;
                     transition: all 0.3s ease;
+                    font-size: 0.95rem;
                 }
                 .nav-link:hover {
                     color: white !important;
@@ -157,6 +176,9 @@
                     border-top: 1px solid rgba(0,0,0,0.1);
                     text-align: center;
                 }
+                .dropdown-item .fas {
+                    font-weight: bold;
+                }
             </style>
         {% endblock %}
     </head>
@@ -177,7 +199,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link{% if app.request.get('_route') == 'app_developer_dashboard' %} active{% endif %}" href="{{ path('app_developer_dashboard') }}">
                                         <i class="fas fa-chart-line me-1"></i>
-                                        Tableau de bord
+                                        Dashboard
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -223,7 +245,7 @@
 
                             <li class="nav-item">
                                 <a class="nav-link{% if app.request.get('_route') in ['app_favorite_list', 'app_company_favorites'] %} active{% endif %}" href="{{ is_granted('ROLE_COMPANY') ? path('app_company_favorites') : path('app_favorite_list') }}">
-                                    <i class="fas fa-heart me-1" style="color: #ff4d4d"></i>
+                                    <i class="fas fa-heart me-1" style="color: yellow"></i>
                                     Favoris
                                 </a>
                             </li>
@@ -263,7 +285,7 @@
                                     <i class="fas fa-user-circle me-2"></i>
                                     <span class="d-none d-lg-inline">
                                         {% if is_granted('ROLE_DEVELOPER') %}
-                                            {{ app.user.developerProfile.firstName }} {{ app.user.developerProfile.lastName }}
+                                            {{ app.user.developerProfile.firstName }}
                                         {% else %}
                                             {{ app.user.companyProfile.name }}
                                         {% endif %}
@@ -273,20 +295,20 @@
                                     {% if is_granted('ROLE_DEVELOPER') %}
                                         <li>
                                             <a class="dropdown-item" href="{{ path('app_developer_profile') }}">
-                                                <i class="fas fa-user me-2"></i>Mon profil
+                                                <i class="fas fa-user me-2"></i><b>Mon profil</b>
                                             </a>
                                         </li>
                                     {% else %}
                                         <li>
                                             <a class="dropdown-item" href="{{ path('app_company_profile') }}">
-                                                <i class="fas fa-building me-2"></i>Mon entreprise
+                                                <i class="fas fa-building me-2"></i><b>Mon entreprise</b>
                                             </a>
                                         </li>
                                     {% endif %}
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <a class="dropdown-item text-danger" href="{{ path('app_logout') }}">
-                                            <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                                            <i class="fas fa-sign-out-alt me-2"></i><b>Déconnexion</b>
                                         </a>
                                     </li>
                                 </ul>
