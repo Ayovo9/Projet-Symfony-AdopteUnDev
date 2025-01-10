@@ -4,39 +4,52 @@ services:
       context: .
       dockerfile: dockerfile
     volumes:
-      - .:/var/www:rw,cached
+      - .:/var/www/html
     ports:
-      - "8000:8000" # Accès local
+      - "8888:80" # Changement du port pour éviter le conflit avec XAMPP
     depends_on:
-      - database
+      database:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "mysql://root:root@database:3306/adopteundev?serverVersion=8.0.32&charset=utf8mb4"
+      APP_ENV: dev
+      APP_DEBUG: 1
+      XDEBUG_MODE: debug
+      PHP_IDE_CONFIG: serverName=symfony
+      PHP_OPCACHE_VALIDATE_TIMESTAMPS: 1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
 
   database:
-    image: mysql:8.0 # Version MySQL
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --innodb-buffer-pool-size=1G
     environment:
-      MYSQL_ROOT_PASSWORD: root       # Mot de passe root (changez-le en prod)
-      MYSQL_DATABASE: adopteundev     # Nom de la base de données
-      MYSQL_USER: root            # Utilisateur MySQL
-      MYSQL_PASSWORD:     # Mot de passe utilisateur
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: adopteundev
     ports:
-      - "3306:3306" # Port par défaut pour MySQL
+      - "3307:3306" # Changement du port MySQL aussi pour éviter le conflit
     volumes:
-      - mysql_data:/var/lib/mysql:rw # Volume pour la persistance des données
+      - mysql_data:/var/lib/mysql:delegated
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 3
+    restart: unless-stopped
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
       PMA_HOST: database
-      PMA_USER: dev_user
-      PMA_PASSWORD: dev_password
+      PMA_USER: root
+      PMA_PASSWORD: root
+      UPLOAD_LIMIT: 64M
     ports:
-      - "8080:80" # Accès PhpMyAdmin via localhost:8080
+      - "8081:80" # Changement du port de phpMyAdmin aussi
     depends_on:
       - database
+    restart: unless-stopped
 
 volumes:
   mysql_data:

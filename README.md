@@ -9,14 +9,12 @@ AdopteUnDev est une plateforme web développée avec Symfony qui permet de mettr
 - Publication et recherche d'offres d'emploi
 - Système de matching basé sur les compétences
 
-## 🚀 Installation
+## 🚀 Installation avec Docker
 
 ### Prérequis
-- PHP 8.1 ou supérieur
-- Composer
-- Symfony CLI
-- MySQL ou MariaDB
-- Node.js et npm
+- Docker
+- Docker Compose
+- Git
 
 ### Étapes d'installation
 
@@ -26,77 +24,67 @@ git clone https://github.com/Ayovo9/Projet-Symfony-AdopteUnDev.git
 cd Projet-Symfony-AdopteUnDev
 ```
 
-2. **Installer les dépendances PHP**
+2. **Lancer les conteneurs Docker**
 ```bash
-composer install
+docker-compose up --build -d
 ```
 
-3. **Installer les dépendances JavaScript**
+3. **Attendre que les conteneurs soient prêts**
+- L'application sera accessible sur : `http://localhost:8888`
+- PhpMyAdmin sera accessible sur : `http://localhost:8081`
+  - Utilisateur : `root`
+  - Mot de passe : `root`
+
+4. **Initialiser la base de données (première installation uniquement)**
 ```bash
-npm install
-npm run build
+# Créer le schéma de la base de données
+docker-compose exec app php bin/console doctrine:schema:create
+
+# Remplir la base de données avec des données de test
+
+### 🔧 Configuration
+
+Les services suivants sont configurés :
+- **Application Symfony** : `http://localhost:8888`
+- **Base de données MySQL**
+  - Hôte : `database`
+  - Port : `3306`
+  - Base de données : `adopteundev`
+  - Utilisateur : `root`
+  - Mot de passe : `root`
+- **PhpMyAdmin** : `http://localhost:8081`
+
+### 🛠 Commandes utiles
+
+```bash
+# Démarrer les conteneurs
+docker-compose up -d
+
+# Arrêter les conteneurs
+docker-compose down
+
+# Voir les logs de l'application
+docker-compose logs app
+
+# Exécuter des commandes Symfony
+docker-compose exec app php bin/console [commande]
+
+# Accéder au shell du conteneur
+docker-compose exec app bash
 ```
 
-4. **Configurer la base de données**
-- Copier le fichier .env en .env.local
-- Modifier la ligne DATABASE_URL avec vos informations de connexion
+### 🔍 Debug
 
-5. **Créer la base de données et les tables**
-```bash
-php bin/console doctrine:database:create
-php bin/console doctrine:migrations:migrate
-```
+- Xdebug est configuré et prêt à être utilisé
+- Les logs de l'application sont accessibles via `docker-compose logs app`
+- En cas de problème de permissions : `docker-compose exec app chown -R www-data:www-data /var/www/html`
 
-6. **Charger les données de test (optionnel)**
-```bash
-php bin/console doctrine:fixtures:load
-```
-
-7. **Démarrer le serveur**
-```bash
-symfony server:start
-```
-
-Le site sera accessible à l'adresse : `http://localhost:8000`
-
-## 👥 Comptes de test
-
-### Compte Développeur
-- Email : dev@test.com
-- Mot de passe : password123
-
-### Compte Entreprise
-- Email : company@test.com
-- Mot de passe : password123
-
-## 🛠 Fonctionnalités
-
-### Pour les Développeurs
-- Création et gestion de profil
-- Système de matching avec les offres
-- Gestion des favoris
-
-### Pour les Entreprises
-- Gestion du profil entreprise
-- Publication d'offres d'emploi
-- Recherche de développeurs
 
 ## 🤝 Contribution
 Le projet est divisé en deux branches principales de développement :
 - `dev-amevi` : Fonctionnalités développeurs
 - `dev-victor` : Fonctionnalités entreprises
 
-## Structure des Branches
-- `main` : Version stable de production
-- `dev-amevi` : Branche de développement pour Amevi
-- `dev-victor` : Branche de développement pour Victor
-
-## Workflow Git
-1. Toujours créer une nouvelle branche à partir de main pour chaque fonctionnalité
-2. Faire des commits réguliers avec des messages descriptifs
-3. Pousser les modifications sur sa branche de développement
-4. Créer une Pull Request vers main quand la fonctionnalité est prête
-5. Faire valider la PR par l'autre développeur avant de merger
 
 ## Contacts
 - Amevi : amevi.yovo@etudiant.univ-rennes.fr
