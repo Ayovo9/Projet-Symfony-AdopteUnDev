@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ developer.firstName }} {{ developer.lastName }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .profile-header {
+            background-color: #f8f9fa;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1.5rem;
+        }
+        .profile-card {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .programming-language-badge {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+        .info-item {
+            margin-bottom: 1rem;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="profile-header">
+        <div class="container text-center">
+            {% if developer.avatar %}
+                <img src="{{ asset(developer.avatar) }}" alt="Avatar" class="profile-avatar">
+            {% else %}
+                <div class="profile-avatar bg-secondary d-flex align-items-center justify-content-center text-white mx-auto">
+                    <i class="fas fa-user fa-3x"></i>
+                </div>
+            {% endif %}
+            <h1 class="display-4">{{ developer.firstName }} {{ developer.lastName }}</h1>
+            {% if developer.title %}
+                <p class="lead text-muted">{{ developer.title }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="profile-card">
+                    {% if developer.location %}
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-map-marker-alt me-2"></i>Localisation
+                            </div>
+                            <div>{{ developer.location }}</div>
+                        </div>
+                    {% endif %}
+
+                    {% if developer.programmingLanguages %}
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-code me-2"></i>Langages de programmation
+                            </div>
+                            <div>
+                                {% for language in developer.programmingLanguages %}
+                                    <span class="programming-language-badge">{{ language }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if developer.bio %}
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-user-circle me-2"></i>À propos
+                            </div>
+                            <div>{{ developer.bio }}</div>
+                        </div>
+                    {% endif %}
+
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="far fa-clock me-2"></i>Membre depuis
+                        </div>
+                        <div>{{ developer.createdAt|date('d/m/Y') }}</div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <a href="{{ path('app_company_developers_search') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Retour à la recherche
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

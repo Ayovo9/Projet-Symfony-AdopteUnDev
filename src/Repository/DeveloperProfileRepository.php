@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\DeveloperProfile;
+use App\Entity\JobPost;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -40,5 +41,28 @@ class DeveloperProfileRepository extends ServiceEntityRepository
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+    }
+
+    public function findNewMatchingDevelopers(JobPost $jobPost, \DateTime $since): array
+    {
+        $qb = $this->createQueryBuilder('d')
+            ->join('d.user', 'u')
+            ->where('u.lastLoginAt >= :since')
+            ->setParameter('since', $since);
+
+        // Ajouter les critères de correspondance basés sur les compétences
+        if (!empty($jobPost->getProgrammingLanguages())) {
+            $orConditions = [];
+            foreach ($jobPost->getProgrammingLanguages() as $key => $skill) {
+                $orConditions[] = "d.programmingLanguages LIKE :skill" . $key;
+                $qb->setParameter('skill' . $key, '%' . $skill . '%');
+            }
+            
+            if (!empty($orConditions)) {
+                $qb->andWhere('(' . implode(' OR ', $orConditions) . ')');
+            }
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\JobPost;
 use App\Form\JobPostType;
+use App\Service\MatchingNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,11 +15,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/company/job')]
 class JobController extends AbstractController
 {
-    private $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private MatchingNotificationService $matchingNotificationService
+    ) {
     }
 
     #[Route('/new', name: 'app_company_job_new')]
@@ -36,6 +36,9 @@ class JobController extends AbstractController
             $this->entityManager->persist($job);
             $this->entityManager->flush();
 
+            // Chercher les développeurs qui correspondent et les notifier
+            $this->matchingNotificationService->checkNewMatchesForJob($job);
+
             $this->addFlash('success', 'Votre offre a été publiée avec succès !');
             return $this->redirectToRoute('app_company_dashboard');
         }
@@ -49,23 +52,28 @@ class JobController extends AbstractController
     public function show(JobPost $job): Response
     {
         // Si l'utilisateur est un développeur, il peut voir toutes les offres
-        // Si l'utilisateur est une entreprise, il ne peut voir que ses propres offres
-        if ($this->isGranted('ROLE_COMPANY') && $job->getCompany() !== $this->getUser()->getCompanyProfile()) {
-            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à voir cette offre.');
+        if ($this->isGranted('ROLE_DEVELOPER')) {
+            return $this->render('job/show.html.twig', [
+                'job' => $job
+            ]);
         }
 
-        return $this->render('job/show.html.twig', [
-            'job' => $job,
-            'isOwner' => $this->isGranted('ROLE_COMPANY') && $job->getCompany() === $this->getUser()->getCompanyProfile()
-        ]);
+        // Si l'utilisateur est une entreprise, il ne peut voir que ses propres offres
+        if ($this->isGranted('ROLE_COMPANY') && $job->getCompany() === $this->getUser()->getCompanyProfile()) {
+            return $this->render('job/show.html.twig', [
+                'job' => $job
+            ]);
+        }
+
+        throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette offre.');
     }
 
-    #[Route('/{id}/edit', name: 'app_job_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_company_job_edit')]
+    #[IsGranted('ROLE_COMPANY')]
     public function edit(Request $request, JobPost $job): Response
     {
-        // Vérifier que l'entreprise est propriétaire de l'offre
         if ($job->getCompany() !== $this->getUser()->getCompanyProfile()) {
-            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à modifier cette offre.');
+            throw $this->createAccessDeniedException('Vous ne pouvez pas modifier cette offre.');
         }
 
         $form = $this->createForm(JobPostType::class, $job);
@@ -73,6 +81,9 @@ class JobController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->flush();
+
+            // Vérifier les nouveaux matchs après la modification
+            $this->matchingNotificationService->checkNewMatchesForJob($job);
 
             $this->addFlash('success', 'Votre offre a été mise à jour avec succès !');
             return $this->redirectToRoute('app_company_dashboard');
@@ -84,18 +95,17 @@ class JobController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_job_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'app_company_job_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_COMPANY')]
     public function delete(Request $request, JobPost $job): Response
     {
-        // Vérifier que l'entreprise est propriétaire de l'offre
         if ($job->getCompany() !== $this->getUser()->getCompanyProfile()) {
-            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à supprimer cette offre.');
+            throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer cette offre.');
         }
 
         if ($this->isCsrfTokenValid('delete'.$job->getId(), $request->request->get('_token'))) {
             $this->entityManager->remove($job);
             $this->entityManager->flush();
-
             $this->addFlash('success', 'L\'offre a été supprimée avec succès.');
         }
 

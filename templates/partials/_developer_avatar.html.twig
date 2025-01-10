@@ -1,0 +1,32 @@
+{% if developer.avatar %}
+    <img src="{{ asset('uploads/avatars/' ~ developer.avatar) }}" 
+         alt="Avatar de {{ developer.firstName }} {{ developer.lastName }}" 
+         class="developer-avatar">
+{% else %}
+    <div class="developer-avatar-placeholder">
+        <i class="fas fa-user-circle"></i>
+    </div>
+{% endif %}
+
+<style>
+    .developer-avatar,
+    .developer-avatar-placeholder {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+    .developer-avatar {
+        object-fit: cover;
+    }
+
+    .developer-avatar-placeholder {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+    }
+</style>

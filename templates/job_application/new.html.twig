@@ -1,0 +1,152 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Postuler - {{ jobPost.title }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .job-details-card {
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(to right, #f8f9fa, #ffffff);
+            margin-bottom: 2rem;
+        }
+        
+        .job-header {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .application-form {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .motivation-letter {
+            min-height: 200px;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .file-upload {
+            border: 2px dashed #dee2e6;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload:hover {
+            border-color: #6c757d;
+            background-color: #f8f9fa;
+        }
+        
+        .action-buttons {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .submit-btn {
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+        }
+        
+        .back-btn {
+            padding: 0.75rem 2rem;
+        }
+        
+        .company-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-right: 2rem;
+        }
+        
+        .info-icon {
+            margin-right: 0.5rem;
+            color: #6c757d;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="job-header">
+        <h1 class="h2 mb-4">
+            <i class="fas fa-briefcase me-2"></i>
+            {{ jobPost.title }}
+        </h1>
+        
+        <div class="company-info">
+            <div class="info-item">
+                <i class="fas fa-building info-icon"></i>
+                <span>{{ jobPost.company.name }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-map-marker-alt info-icon"></i>
+                <span>{{ jobPost.location }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-file-contract info-icon"></i>
+                <span>{{ jobPost.contractType }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="application-form">
+        {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+        
+        <div class="mb-4">
+            {{ form_label(form.motivationLetter, 'Lettre de motivation', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.motivationLetter, {
+                'attr': {
+                    'class': 'form-control motivation-letter',
+                    'placeholder': 'Exprimez votre motivation pour ce poste...'
+                }
+            }) }}
+            {{ form_errors(form.motivationLetter) }}
+        </div>
+
+        <div class="mb-4">
+            <div class="file-upload">
+                {{ form_label(form.cvFile, 'Votre CV', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.cvFile, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.cvFile) }}
+                <div class="mt-2">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <small class="text-muted">Format accepté : PDF uniquement</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-primary submit-btn">
+                <i class="fas fa-paper-plane me-2"></i>
+                Envoyer ma candidature
+            </button>
+            <a href="{{ path('app_job_show', {'id': jobPost.id}) }}" class="btn btn-outline-secondary back-btn">
+                <i class="fas fa-arrow-left me-2"></i>
+                Retour
+            </a>
+        </div>
+        
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

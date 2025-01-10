@@ -43,6 +43,9 @@ class JobPost
     #[ORM\Column]
     private ?\DateTime $createdAt = null;
 
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTime $lastMatchCheckAt = null;
+
     #[ORM\OneToMany(mappedBy: 'jobPost', targetEntity: JobMatch::class, orphanRemoval: true)]
     private Collection $matches;
 
@@ -153,6 +156,17 @@ class JobPost
     public function setCreatedAt(\DateTime $createdAt): static
     {
         $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getLastMatchCheckAt(): ?\DateTime
+    {
+        return $this->lastMatchCheckAt;
+    }
+
+    public function setLastMatchCheckAt(?\DateTime $lastMatchCheckAt): static
+    {
+        $this->lastMatchCheckAt = $lastMatchCheckAt;
         return $this;
     }
 
